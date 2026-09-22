@@ -194,5 +194,8 @@ Measured with Vision feature print revision 2 on the bundled samples (`scripts/e
 **Chosen: 0.15** (`DuplicateCheckQuery.defaultMaxDistance`), with the 200 m geo box. The plan's starting value 0.35 matched different
 potholes. Re-check with real re-photographs on a device (Settings → Developer → Last duplicate check) before a customer demo.
 
+Device check (iPhone 15 Pro Max, live Vision, 30 seeded samples): worst cosine distance to the Mac precompute for the same bytes
+**2.1e-4**; labels identical for 30/30. Far below the 0.10 → 0.15 margin, so simulator and device find the same duplicates.
+
 Classification note: `VNClassifyImageRequest` has no pavement labels; close-up potholes score under 0.1 on everything
 (top guesses include `liquid`, `water`, and at 0.057 `alligator_crocodile`). The 0.1 cutoff stays; the crew member picks the category.
