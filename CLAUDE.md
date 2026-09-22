@@ -18,16 +18,15 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **2 (AI + duplicate check) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 3.**
+Phase: **3 (sync) — complete on the simulator 2026-09-22, waiting for Matt's go-ahead on Phase 4.**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- Works (simulator, observed): seeding with analysis; capture → READING THE SCENE → LOOKS FAMILIAR sheet (capture-pothole:
-  2 open reports, 98 %, 39 m / 75 m; resolved 01c excluded) → attach (parent shows +1 attached); graffiti capture: no
-  candidates; Find similar (2 km, any status); Settings → Developer shows exact distances. 10 unit tests pass.
-- Threshold 0.15 (REFERENCE.md §7.2). Simulator uses `Demo/Samples/analysis.json` from `scripts/embed-samples.swift`.
-- Device: Matt ran the flow; phone DB copied: 30 live embeddings within 2.1e-4 of the Mac precompute, labels identical.
-- Swift ~2,500 lines of ~3,000.
-- Device run: phone must be unlocked; `xcrun devicectl device process launch --console --device 00008130-00044CDE1422001C com.couchbase.demo.fieldproof`.
+- Works (simulator + live Capella, observed): SyncManager (one replicator, both collections), SyncBanner (OFFLINE n /
+  SYNCING / SYNCED / PAUSED), Simulate offline, user switch = reset + pull. Seeding pushes as supervisor then switches back.
+  crew-valley holds 25, supervisor 30. Offline capture → pending 1 → online → 0; report + photo verified on the server.
+- REST blob name is `blob_%2Fphoto` (REFERENCE.md §7.3). Earlier phases: AI + duplicate check (0.15), device-verified vectors.
+- Device: builds; sync not yet run on the phone. Swift ~2,770 lines of ~3,000.
+- Simulator taps don't flip iOS 26 toggles; use a short slide.
 - Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 
 ## Non-negotiable rules

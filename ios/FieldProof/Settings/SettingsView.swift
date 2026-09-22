@@ -6,6 +6,8 @@ struct SettingsView: View {
     // MARK: - State
 
     @EnvironmentObject private var state: AppState
+    @EnvironmentObject private var sync: SyncManager
+    @State private var pendingUser: AppUser?
     @Environment(\.dismiss) private var dismiss
     @State private var seeding: (done: Int, total: Int)?
     @State private var message: String?
@@ -27,7 +29,7 @@ struct SettingsView: View {
                 PosterCard {
                     VStack(alignment: .leading, spacing: Theme.Space.s) {
                         ForEach(AppUser.allCases) { user in
-                            Button { state.user = user } label: {
+                            Button { if user != state.user { pendingUser = user } } label: {
                                 HStack {
                                     Image(systemName: state.user == user ? "largecircle.fill.circle" : "circle")
                                         .foregroundStyle(Theme.Palette.pine)
@@ -43,6 +45,21 @@ struct SettingsView: View {
                         }
                         Text("For the demo, pick a user. In production this is your identity provider.")
                             .font(Theme.Typeface.body(13)).foregroundStyle(Theme.Palette.charcoal)
+                    }
+                }
+
+                heading("SYNC")
+                PosterCard {
+                    VStack(alignment: .leading, spacing: Theme.Space.m) {
+                        Toggle(isOn: $sync.simulatedOffline) {
+                            VStack(alignment: .leading) {
+                                Text("Simulate offline").font(Theme.Typeface.heading(16))
+                                Text("Stops sync, like airplane mode. Capture keeps working.").font(Theme.Typeface.body(13))
+                            }
+                            .foregroundStyle(Theme.Palette.charcoal)
+                        }
+                        .tint(Theme.Palette.pine)
+                        Text(syncStatus).font(Theme.Typeface.mono(12)).foregroundStyle(Theme.Palette.charcoal)
                     }
                 }
 
@@ -92,6 +109,15 @@ struct SettingsView: View {
         }
         .background(Theme.Palette.paper)
         .sheet(isPresented: $showDeveloper) { DeveloperView() }
+        .confirmationDialog(
+            "Switch to \(pendingUser?.rawValue ?? "")?", isPresented: Binding(get: { pendingUser != nil }, set: { if !$0 { pendingUser = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Switch and reload", role: .destructive) { if let user = pendingUser { switchUser(to: user) } }
+        } message: {
+            Text("The phone clears its local reports and pulls this user's districts from the server."
+                 + (sync.pendingCount > 0 ? " \(sync.pendingCount) unsynced reports will be lost." : ""))
+        }
         .confirmationDialog("Delete every report on this phone?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Delete local data", role: .destructive) { reset() }
         } message: {
@@ -106,26 +132,59 @@ struct SettingsView: View {
         return "Loading \(seeding.done) of \(seeding.total)…"
     }
 
+    private var syncStatus: String {
+        guard sync.isConfigured else { return "Not configured: add Config/Secrets.plist to sync." }
+        let error = sync.lastError.map { "\nerror: \($0)" } ?? ""
+        return "replicator: \(String(describing: sync.activity)) · pending reports: \(sync.pendingCount)\(error)"
+    }
+
     private func heading(_ text: String) -> some View {
         Text(text).font(Theme.Typeface.heading(15)).tracking(0.8).foregroundStyle(Theme.Palette.pineLight)
     }
 
     // MARK: - Actions
 
+    /// Seeds as the supervisor (who can write every district), waits for the push, then hands the phone back.
+    /// Without sync configured, seeds stay on this phone.
     private func loadSamples() {
+        let online = sync.isConfigured && !sync.simulatedOffline
+        if sync.isConfigured && !online {
+            message = "Turn off Simulate offline first: samples sync up as the supervisor."
+            return
+        }
         seeding = (0, 0)
         message = nil
-        let repository = state.repository, deviceId = state.deviceId
+        let original = state.user
         Task {
             do {
+                if online && original != .supervisor { try state.switchUser(to: .supervisor, reset: false) }
+                let repository = state.repository, deviceId = state.deviceId
                 let written = try await Task.detached {
                     try await SeedData.load(into: repository, deviceId: deviceId) { done, total in seeding = (done, total) }
                 }.value
-                message = "Loaded \(written) sample reports."
+                if online {
+                    message = "Syncing samples up…"
+                    let pushed = await sync.waitUntilPushed()
+                    if original != .supervisor {
+                        if pushed { try state.switchUser(to: original, reset: true) } else { try state.switchUser(to: original, reset: false) }
+                    }
+                    message = pushed ? "Loaded \(written) sample reports and synced them." : "Loaded \(written) sample reports; sync has not finished."
+                } else {
+                    message = "Loaded \(written) sample reports on this phone."
+                }
             } catch {
                 message = "Sample load failed: \(error.localizedDescription)"
             }
             seeding = nil
+        }
+    }
+
+    private func switchUser(to user: AppUser) {
+        do {
+            try state.switchUser(to: user, reset: true)
+            message = "Signed in as \(user.rawValue). Pulling that user's reports."
+        } catch {
+            message = "Switch failed: \(error.localizedDescription)"
         }
     }
 

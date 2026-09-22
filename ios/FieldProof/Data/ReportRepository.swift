@@ -13,8 +13,8 @@ final class ReportRepository {
     // MARK: - State
 
     let database: Database
-    private let reports: Collection
-    private let photos: Collection
+    let reports: Collection
+    let photos: Collection
     private var tokens: [ListenerToken] = []
 
     // MARK: - Init

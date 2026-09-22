@@ -24,6 +24,7 @@ struct ReportListView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     header
+                    SyncBanner(sync: state.sync)
                     filters
                     if filtered.isEmpty {
                         EmptyTrailView()

@@ -199,3 +199,13 @@ Device check (iPhone 15 Pro Max, live Vision, 30 seeded samples): worst cosine d
 
 Classification note: `VNClassifyImageRequest` has no pavement labels; close-up potholes score under 0.1 on everything
 (top guesses include `liquid`, `water`, and at 0.057 `alligator_crocodile`). The 0.1 cutoff stays; the crew member picks the category.
+
+### 7.3 Sync findings (Phase 3, 2026-09-22)
+
+| Finding | Evidence | Consequence |
+|---|---|---|
+| **Synced Couchbase Lite blobs are exposed as attachment `blob_/<property>`**, e.g. `_attachments["blob_/photo"]`, and the name must be URL-encoded in the path: `GET /{keyspace}/{docid}/blob_%2Fphoto` (200, bytes = stored JPEG, SHA-256 = `imageHash`). The unencoded `blob_/photo` returns 404; plain `/photo` returns 404. The document field `photo` keeps the blob metadata (`@type: blob`, `digest`, `length`). | Live probe as `supervisor` | Dashboard and `tamper.mjs` use `blob_%2Fphoto` / `blob_%2Fthumbnail`. Whether a REST PUT to `blob_%2Fphoto` is picked up by the phone's `photo` blob must be tested in Phase 4. |
+| Report doc arrives before its photo doc: `_changes` seq 108 (report) then 109 (photo) for the same capture. | Live probe | Two-document design confirmed. |
+| `pendingDocumentIds(collection:)` counts unsynced local saves while the replicator is stopped (1 after an offline capture), then 0 after restart. | Simulator | Banner count. |
+| Channel scoping: after reset, `crew-valley` pulls 25 reports (Valley only); `supervisor` pulls 30. | Simulator | Acceptance. |
+| iOS 26 `Toggle`: the simulator tool's instant tap does not flip it; a short slide does. Not an app bug. | Simulator | Note for automated testing only. |

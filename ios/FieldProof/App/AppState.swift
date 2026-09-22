@@ -9,7 +9,7 @@ final class AppState: ObservableObject {
 
     @Published private(set) var repository: ReportRepository
     @Published private(set) var reports: [Report] = []
-    @Published var user: AppUser {
+    @Published private(set) var user: AppUser {
         didSet { UserDefaults.standard.set(user.rawValue, forKey: Keys.user) }
     }
     /// Last duplicate check, shown on Settings → Developer to tune the threshold.
@@ -21,6 +21,7 @@ final class AppState: ObservableObject {
     // MARK: - Services
 
     let location = LocationService()
+    let sync = SyncManager()
     let deviceId: String
 
     // MARK: - Init
@@ -41,17 +42,29 @@ final class AppState: ObservableObject {
         }
         repository = try ReportRepository(database: database)
         try startFeed()
+        sync.start(repository: repository, user: user)
+    }
+
+    // MARK: - User
+
+    /// Hands the phone to another user. With `reset`, local data is cleared first, so the phone then holds
+    /// only what the new user's channels allow (the replicator pulls it back down).
+    func switchUser(to newUser: AppUser, reset: Bool) throws {
+        user = newUser
+        if reset { try resetLocalData() } else { sync.start(repository: repository, user: newUser) }
     }
 
     // MARK: - Reset
 
     /// Deletes the on-device database and starts fresh (Settings → Reset local data).
     func resetLocalData() throws {
+        sync.stop()
         try repository.close()
         try Database.delete(withName: DatabaseManager.databaseName)
         repository = try ReportRepository(database: DatabaseManager.open())
         reports = []
         try startFeed()
+        sync.start(repository: repository, user: user)
     }
 
     // MARK: - Private

@@ -23,6 +23,7 @@ struct FieldProofApp: App {
         WindowGroup {
             ReportListView()
                 .environmentObject(state)
+                .environmentObject(state.sync)
                 .preferredColorScheme(.light)
                 .tint(Theme.Palette.sienna)
         }
