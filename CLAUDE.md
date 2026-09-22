@@ -18,15 +18,16 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **4 (dashboard) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 5.**
+Phase: **5 (demo polish + README) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 6 (docs).**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- Works (observed end to end, simulator + live Capella + dashboard at localhost:3000): the §14 demo script from a reset
-  (seed 30 → offline pothole capture → LOOKS FAMILIAR → attach → OFFLINE 2 → online → dashboard +1 attached →
-  VERIFIED → `npm run tamper` → MISMATCH on dashboard and phone → status change reaches phone live → `npm run reset`).
-- Dashboard: `npm start` in dashboard/ (Node from /opt/homebrew/bin). `npm test` 4/4. Map tiles: OpenStreetMap (CARTO needs a key now).
-- Findings in REFERENCE.md §7.3–7.4 (blob attachment naming, two-step tamper, tombstoned ids, `_sync:` docs).
-- Swift ~2,780 lines, JS ~520. Sync on the physical phone not yet run.
+- README.md covers prerequisites, Capella setup, secrets, run, the 5-minute demo script with timings, troubleshooting.
+- Demo script rehearsed 3× end to end from reset: seed 13–19 s to 30 pins, offline capture → LOOKS FAMILIAR (2 open,
+  98 %) every time, attach syncs in under a second, verify → tamper → MISMATCH, status change reaches the phone live.
+- Polish: header + sync banner + filters pinned (banner always visible), Find similar loading state, app icon, README banner.
+- Tests: `npm test` 4/4, Swift 10/10. Device build + install OK (not driven by hand this phase).
+- Known shortcuts logged in DEFECTS.md: D3 no swipe-back on detail, D4 unit tests launch the app and sync.
+- Swift ~2,790 lines, JS ~520. Cluster left empty after the last reset.
 - Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 
 ## Non-negotiable rules

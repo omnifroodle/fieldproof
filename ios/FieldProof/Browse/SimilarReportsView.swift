@@ -28,6 +28,13 @@ struct SimilarReportsView: View {
                     }
                     Text("Photos that look like this one, within 2 km, any status. Searched on this phone.")
                         .font(Theme.Typeface.body(15)).foregroundStyle(Theme.Palette.charcoal)
+                    if results == nil {
+                        HStack(spacing: Theme.Space.s) {
+                            ProgressView().tint(Theme.Palette.pine)
+                            Text("SEARCHING THIS PHONE…").font(Theme.Typeface.label(14)).foregroundStyle(Theme.Palette.pineLight)
+                        }
+                        .padding(.vertical, Theme.Space.l)
+                    }
                     if let results, results.isEmpty {
                         EmptyTrailView(message: "NOTHING ALIKE NEARBY", detail: "No report within 2 km has a photo like this one.")
                     }

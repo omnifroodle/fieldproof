@@ -21,11 +21,13 @@ struct ReportListView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    header
-                    SyncBanner(sync: state.sync)
-                    filters
+            // Header, sync banner, and filters stay put; only the reports scroll, so the audience can always
+            // see whether the phone is offline, syncing, or synced.
+            VStack(spacing: 0) {
+                header
+                SyncBanner(sync: state.sync)
+                filters
+                ScrollView {
                     if filtered.isEmpty {
                         EmptyTrailView()
                     } else {
@@ -36,9 +38,9 @@ struct ReportListView: View {
                             }
                         }
                         .padding(Theme.Space.l)
+                        .padding(.bottom, 80)
                     }
                 }
-                .padding(.bottom, 96)
             }
             .ignoresSafeArea(edges: .top)
             .background(Theme.Palette.paper)

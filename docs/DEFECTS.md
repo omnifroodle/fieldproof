@@ -7,6 +7,8 @@ Status: **open**, **deferred** (accepted for the demo), or **fixed** (with the c
 |---|---|---|---|---|
 | D1 | App Services auth model is messy; supervisor needs explicit channels | App Services | open | 2026-09-22, Phase 0 |
 | D2 | App user passwords are bundled in the iOS app | iOS / security | open | 2026-09-22, Phase 0 |
+| D3 | No swipe-back gesture on the report detail screen | iOS / UX | open | 2026-09-22, Phase 5 |
+| D4 | Running the unit tests syncs the app to Capella | iOS / tests | open | 2026-09-22, Phase 5 |
 
 ---
 
@@ -67,3 +69,21 @@ and the App Services OIDC configuration in the official docs, and add them to RE
 
 Demo stance until then: keep `Secrets.plist`, and say it on stage: "for the demo we pick a user; in production this is
 your identity provider via OIDC."
+
+## D3 — No swipe-back gesture on the report detail screen
+
+Each screen draws its own poster title, so the navigation bar is hidden (`docs/STYLE-GUIDE.md` §7). Hiding it also
+disables SwiftUI's interactive pop, so the edge swipe does nothing on the detail screen; the chevron button in the
+title row is the only way back. Nobody has stumbled on it in rehearsal, but it is not what an iPhone user expects.
+
+Fix later: keep the bar hidden and re-enable the gesture with a small `UINavigationController` interaction-delegate
+shim, or show a bar with a transparent background and a custom back button.
+
+## D4 — Running the unit tests syncs the app to Capella
+
+`FieldProofTests` uses the app as its test host, so `xcodebuild test` launches FieldProof, which starts the replicator
+and syncs whatever is on the simulator. The tests themselves are pure (hash, geo box, document mapping) and touch no
+network, but the run does, and it also terminates a running app mid-demo.
+
+Fix later: skip `sync.start(...)` in `AppState.init` when `NSClassFromString("XCTestCase") != nil`, or give the tests
+their own host-less target now that nothing in them needs the app bundle except `@testable import`.
