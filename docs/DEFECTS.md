@@ -1,0 +1,69 @@
+# FieldProof — Defect and Cleanup Log
+
+Things that work for the demo but should be reviewed or cleaned up later. Newest at the bottom.
+Status: **open**, **deferred** (accepted for the demo), or **fixed** (with the commit or phase).
+
+| # | Title | Area | Status | Raised |
+|---|---|---|---|---|
+| D1 | App Services auth model is messy; supervisor needs explicit channels | App Services | open | 2026-09-22, Phase 0 |
+| D2 | App user passwords are bundled in the iOS app | iOS / security | open | 2026-09-22, Phase 0 |
+
+---
+
+## D1 — App Services auth model is messy; supervisor needs explicit channels
+
+**What happened.** The plan gave `supervisor` the `*` channel. In Phase 0 testing, `*` let the supervisor read every
+document but not write any: the sync function calls `requireAccess("district.<id>")`, and `*` does not satisfy that
+("sg missing channel access"). The fix was to list `district.valley` and `district.tuolumne` explicitly on both collections.
+Also found along the way: the Capella Admin API cannot touch documents, and `_all_docs` is disabled on the Public API
+(REFERENCE.md §3, §7).
+
+**Why it feels messy.** Access is spread across three places: user channel grants (Capella UI), the sync function
+(`appservices/*.js`), and which API and credential each component uses. The supervisor's rights are a hand-kept list
+that must change whenever a district is added.
+
+**What to understand** (to review together):
+- Channels decide who can *read* a document. The sync function's `channel()` puts a document in a channel, and a user
+  sees documents in channels they were granted.
+- `requireAccess()`, `requireUser()`, and `requireRole()` decide who can *write*. They check the writing user
+  against the new document. `*` is a read wildcard, not a grant of every named channel.
+- Roles group channels. A user gets a role's channels.
+
+**Options to clean it up.**
+1. **Roles.** Create `district-valley`, `district-tuolumne`, and `supervisor` roles with channels; users get roles.
+   Adding a district updates one role, not each user.
+2. **Role check in the sync function.** `supervisor` keeps `*` for reads; the sync function allows writes if the user
+   has the `supervisor` role, otherwise `requireAccess(ch)`. One place to read the rule; a few more lines on screen.
+3. **Dynamic grants.** A `district` config document whose sync function calls `access(users, channel)`. Most flexible;
+   most to explain.
+
+Recommendation for a later pass: option 1 (roles), and write the model up in `docs/architecture/sync-and-app-services.md`.
+
+## D2 — App user passwords are bundled in the iOS app
+
+**What happened.** `Secrets.plist` holds the App Services URL and the passwords for `crew-valley`, `crew-tuolumne`,
+and `supervisor`. It is git-ignored, but it is copied into the app bundle, so anyone with the `.ipa` can read every
+user's password. The demo picks a user in Settings with no login.
+
+**Why it is bad.** Shared, long-lived passwords; no per-person identity (the audit trail says `crew-valley`, not who);
+no revocation short of changing the password in every install; and the supervisor password on a crew phone gives
+every crew member supervisor access.
+
+**How it is done in the real world.**
+- **OpenID Connect (OIDC).** App Services supports OIDC providers (Okta, Entra ID, Auth0, Cognito, Google, and so on).
+  The phone signs in with the provider (for example with `ASWebAuthenticationSession`), gets an ID token, and the
+  replicator authenticates with it. App Services can create the user on first sign-in and map provider claims or groups
+  to roles, so district access comes from the identity system. Tokens expire and can be revoked centrally.
+- **Custom auth with sessions.** The company's own backend checks the person's credentials, then calls the App Services
+  Admin API `POST /{db}/_session` to create a session for that user and returns the session to the phone. The phone
+  uses a `SessionAuthenticator`. The admin credential lives only on that backend.
+- **Per-person users**, not shared district accounts, with district rights granted through roles (see D1).
+- **Storage on the device:** tokens in the Keychain, never in the bundle; Couchbase Lite database encryption for data
+  at rest (enterprise enhancement already listed in PLAN §13).
+- **Device management (MDM)** for company phones can push configuration and certificates.
+
+Before this is fixed, look up the current Couchbase Lite Swift authenticators (`SessionAuthenticator`, OIDC support)
+and the App Services OIDC configuration in the official docs, and add them to REFERENCE.md. None are verified yet.
+
+Demo stance until then: keep `Secrets.plist`, and say it on stage: "for the demo we pick a user; in production this is
+your identity provider via OIDC."

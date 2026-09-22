@@ -1,0 +1,16 @@
+# Secrets (only the .example files are committed)
+Secrets.plist
+.env
+
+# Node
+node_modules/
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcuserstate
+build/
+.swiftpm/
+
+# macOS
+.DS_Store

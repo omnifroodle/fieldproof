@@ -1,0 +1,20 @@
+{
+  "name": "fieldproof-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "FieldProof supervisor dashboard: Express + Leaflet, reads Capella via the Couchbase Node SDK.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "test": "node --test",
+    "setup": "node --env-file=.env ../scripts/setup-cluster.mjs",
+    "reset": "node --env-file=.env ../scripts/reset-demo.mjs"
+  },
+  "dependencies": {
+    "couchbase": "4.7",
+    "express": "^5.2.1"
+  }
+}
