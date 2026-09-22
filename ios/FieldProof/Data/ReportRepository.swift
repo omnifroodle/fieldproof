@@ -72,10 +72,13 @@ final class ReportRepository {
         try photos.document(id: report.photoDocId)?.blob(forKey: "photo")?.content
     }
 
-    /// True when the report exists and already has an embedding (used by the seeder).
-    func hasAnalyzedReport(id: String) throws -> Bool {
-        guard let doc = try reports.document(id: id) else { return false }
-        return doc.array(forKey: "embedding") != nil
+    /// True when a report made from this bundled sample file is already on the phone (used by the seeder).
+    func hasSeed(file: String) throws -> Bool {
+        let query = try database.createQuery("SELECT META().id FROM evidence.reports WHERE seedFile = $file LIMIT 1")
+        let params = Parameters()
+        params.setString(file, forName: "file")
+        query.parameters = params
+        return try query.execute().next() != nil
     }
 
     // MARK: - Similar reports
@@ -111,18 +114,18 @@ final class ReportRepository {
 
     /// Calls `onChange` with every report, newest first, now and whenever the collection changes.
     func observeReports(_ onChange: @escaping ([Report]) -> Void) throws {
-        // Talking point: a live query. When a save or a sync changes the results, Couchbase Lite re-runs it and calls us.
         let query = try database.createQuery(
             "SELECT META().id AS id FROM evidence.reports WHERE type = 'report' ORDER BY createdAt DESC"
         )
-        let token = query.addChangeListener { [weak self] change in
-            guard let self, let results = change.results else { return }
-            let list = results.compactMap { row in
-                row.string(forKey: "id").flatMap { try? self.report(id: $0) }
-            }
-            DispatchQueue.main.async { onChange(list) }
+        let reload = { [weak self] in
+            guard let self, let rows = try? query.execute() else { return }
+            let list = rows.compactMap { row in row.string(forKey: "id").flatMap { try? self.report(id: $0) } }
+            onChange(list)
         }
-        tokens.append(token)
+        // Talking point: Couchbase Lite tells the app whenever the collection changes, from a local save or from
+        // a sync, so the list updates by itself when the supervisor changes a status on the dashboard.
+        tokens.append(reports.addChangeListener(queue: .main) { _ in reload() })
+        reload()
     }
 
     // MARK: - Close

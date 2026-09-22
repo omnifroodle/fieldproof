@@ -18,15 +18,15 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **3 (sync) — complete on the simulator 2026-09-22, waiting for Matt's go-ahead on Phase 4.**
+Phase: **4 (dashboard) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 5.**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- Works (simulator + live Capella, observed): SyncManager (one replicator, both collections), SyncBanner (OFFLINE n /
-  SYNCING / SYNCED / PAUSED), Simulate offline, user switch = reset + pull. Seeding pushes as supervisor then switches back.
-  crew-valley holds 25, supervisor 30. Offline capture → pending 1 → online → 0; report + photo verified on the server.
-- REST blob name is `blob_%2Fphoto` (REFERENCE.md §7.3). Earlier phases: AI + duplicate check (0.15), device-verified vectors.
-- Device: builds; sync not yet run on the phone. Swift ~2,770 lines of ~3,000.
-- Simulator taps don't flip iOS 26 toggles; use a short slide.
+- Works (observed end to end, simulator + live Capella + dashboard at localhost:3000): the §14 demo script from a reset
+  (seed 30 → offline pothole capture → LOOKS FAMILIAR → attach → OFFLINE 2 → online → dashboard +1 attached →
+  VERIFIED → `npm run tamper` → MISMATCH on dashboard and phone → status change reaches phone live → `npm run reset`).
+- Dashboard: `npm start` in dashboard/ (Node from /opt/homebrew/bin). `npm test` 4/4. Map tiles: OpenStreetMap (CARTO needs a key now).
+- Findings in REFERENCE.md §7.3–7.4 (blob attachment naming, two-step tamper, tombstoned ids, `_sync:` docs).
+- Swift ~2,780 lines, JS ~520. Sync on the physical phone not yet run.
 - Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 
 ## Non-negotiable rules

@@ -33,6 +33,8 @@ struct Report: Identifiable, Equatable {
     var relatedReportIds: [String] = []
     var attachedTo: String?
     var seed = false
+    /// The bundled file a seed report was made from; used to avoid seeding the same sample twice.
+    var seedFile: String?
 
     var photoDocId: String { Report.photoId(for: id) }
 
@@ -80,6 +82,7 @@ struct Report: Identifiable, Equatable {
         relatedReportIds = document.array(forKey: "relatedReportIds")?.toArray() as? [String] ?? []
         attachedTo = document.string(forKey: "attachedTo")
         seed = document.boolean(forKey: "seed")
+        seedFile = document.string(forKey: "seedFile")
     }
 
     init(
@@ -131,5 +134,6 @@ struct Report: Identifiable, Equatable {
         doc.setArray(MutableArrayObject(data: relatedReportIds), forKey: "relatedReportIds")
         if let attachedTo { doc.setString(attachedTo, forKey: "attachedTo") } else { doc.removeValue(forKey: "attachedTo") }
         doc.setBoolean(seed, forKey: "seed")
+        if let seedFile { doc.setString(seedFile, forKey: "seedFile") }
     }
 }

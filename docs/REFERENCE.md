@@ -204,8 +204,21 @@ Classification note: `VNClassifyImageRequest` has no pavement labels; close-up p
 
 | Finding | Evidence | Consequence |
 |---|---|---|
-| **Synced Couchbase Lite blobs are exposed as attachment `blob_/<property>`**, e.g. `_attachments["blob_/photo"]`, and the name must be URL-encoded in the path: `GET /{keyspace}/{docid}/blob_%2Fphoto` (200, bytes = stored JPEG, SHA-256 = `imageHash`). The unencoded `blob_/photo` returns 404; plain `/photo` returns 404. The document field `photo` keeps the blob metadata (`@type: blob`, `digest`, `length`). | Live probe as `supervisor` | Dashboard and `tamper.mjs` use `blob_%2Fphoto` / `blob_%2Fthumbnail`. Whether a REST PUT to `blob_%2Fphoto` is picked up by the phone's `photo` blob must be tested in Phase 4. |
+| **Synced Couchbase Lite blobs are exposed as attachment `blob_/<property>`**, e.g. `_attachments["blob_/photo"]`, and the name must be URL-encoded in the path: `GET /{keyspace}/{docid}/blob_%2Fphoto` (200, bytes = stored JPEG, SHA-256 = `imageHash`). The unencoded `blob_/photo` returns 404; plain `/photo` returns 404. The document field `photo` keeps the blob metadata (`@type: blob`, `digest`, `length`). | Live probe as `supervisor` | Dashboard and `tamper.mjs` use `blob_%2Fphoto` / `blob_%2Fthumbnail`. |
 | Report doc arrives before its photo doc: `_changes` seq 108 (report) then 109 (photo) for the same capture. | Live probe | Two-document design confirmed. |
 | `pendingDocumentIds(collection:)` counts unsynced local saves while the replicator is stopped (1 after an offline capture), then 0 after restart. | Simulator | Banner count. |
 | Channel scoping: after reset, `crew-valley` pulls 25 reports (Valley only); `supervisor` pulls 30. | Simulator | Acceptance. |
 | iOS 26 `Toggle`: the simulator tool's instant tap does not flip it; a short slide does. Not an app bug. | Simulator | Note for automated testing only. |
+
+### 7.4 Dashboard findings (Phase 4, 2026-09-22)
+
+| Finding | Evidence | Consequence |
+|---|---|---|
+| **Replacing a synced blob over REST takes two writes.** `PUT …/blob_%2Fphoto?rev=` swaps the attachment bytes, but the document's `photo` property still carries the old `digest`/`length`, so phones keep the old blob. Then a full-document `PUT` with `photo = {"@type":"blob", content_type, digest, length}` copied from `_attachments["blob_/photo"]` makes phones pull the new bytes. Verified: the phone showed the swapped photo and Recompute → MISMATCH. | Live probe + simulator | `scripts/tamper.mjs` does both steps. |
+| **Deleted ids cannot be reused by a client.** After a server delete, a phone saving a new document with the same id (`report::seed-pothole-01`) had its push rejected quietly (403 on GET, `_changes` shows the tombstone); the phone accepted the server's deletion as the winner. | Live | Seeds get a fresh id suffix per load and are de-duplicated by a `seedFile` field. |
+| **App Services stores its own documents in the app collections** (`_sync:att2:…` attachment bodies). | SQL++ on `demos`.evidence.reports | `allIds()` skips ids that start with `_sync:`. Never delete those. |
+| **`STARTS_WITH()` is not available** on this Capella query service ("Invalid function STARTS_WITH"); `LIKE` with a backslash escape fails to parse in a JS template string. | Live | Use `SUBSTR(META().id, 0, 6) != "_sync:"`. |
+| Server SQL++ accepts `--` comments (Couchbase Lite does not). | Live | Comments kept inline in `lib/couchbase.js`. |
+| **CARTO basemap tiles now return an "API KEY REQUIRED" watermark tile.** | Browser | Map uses `https://tile.openstreetmap.org/{z}/{x}/{y}.png` with OSM attribution (fine for light demo use under the OSM tile usage policy; https://operations.osmfoundation.org/policies/tiles/). STYLE-GUIDE §5 said CARTO. |
+| A live query did not re-fire for a pulled status change while the app was running (only a relaunch showed it). A `collection.addChangeListener` that re-runs the list query does. | Simulator | `ReportRepository.observeReports` uses the collection listener. |
+| Leaflet 1.9.4 SRI: css `sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=`, js `sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=` (computed from unpkg). | curl + openssl | index.html |

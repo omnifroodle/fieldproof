@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FieldProof · Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono&display=swap">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="detail">
+    <section>
+      <div class="title-row">
+        <a class="back" href="/">← Map</a>
+        <h1 id="title">REPORT</h1>
+        <span class="pill" id="pill"></span>
+      </div>
+      <img class="photo" id="photo" alt="Evidence photo">
+      <div class="panel" id="attached-panel" hidden>
+        <h2 id="attached-title">Attached captures</h2>
+        <div class="attached" id="attached"></div>
+      </div>
+    </section>
+    <section>
+      <div class="panel">
+        <h2>Evidence hash · SHA-256</h2>
+        <div class="stamp-row">
+          <div style="flex:1">
+            <div class="mono" id="hash"></div>
+            <p style="font-size:14px">Computed on the phone when the photo was taken. Verify re-hashes the bytes App Services holds.</p>
+            <button class="btn primary" id="verify">Verify</button>
+          </div>
+          <div class="stamp" id="stamp" hidden></div>
+        </div>
+        <div class="mono" id="verify-detail" style="margin-top:8px"></div>
+      </div>
+      <div class="panel">
+        <h2>Status</h2>
+        <div class="buttons" id="status-buttons"></div>
+        <div class="meta" id="status-msg" style="margin-top:6px">Changes sync down to the crew's phones.</div>
+      </div>
+      <div class="panel">
+        <h2>Captured</h2>
+        <dl id="facts"></dl>
+      </div>
+      <div class="panel">
+        <h2>On-device AI</h2>
+        <dl id="ai"></dl>
+      </div>
+    </section>
+  </div>
+  <script type="module" src="report.js"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FieldProof · Supervisor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600&family=Source+Serif+4:wght@400;600&family=JetBrains+Mono&display=swap">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <svg viewBox="0 0 1200 150" preserveAspectRatio="none" aria-hidden="true">
+      <circle cx="1010" cy="58" r="40" fill="#D9A441"/>
+      <polygon points="0,150 0,93 216,45 408,78 660,33 936,72 1200,51 1200,150" fill="#3E6B4E"/>
+      <polygon points="0,150 0,117 264,75 504,105 792,66 1032,99 1200,84 1200,150" fill="#1F3D2B"/>
+      <polygon points="0,150 0,138 360,114 720,132 984,111 1200,126 1200,150" fill="#2B2B2B"/>
+    </svg>
+    <div class="title">
+      <h1>FIELDPROOF</h1>
+      <div class="sub">Supervisor · Field reports</div>
+    </div>
+    <div class="updated" id="updated">Connecting…</div>
+  </header>
+  <main>
+    <div class="map-frame"><div id="map"></div></div>
+    <section class="side">
+      <div class="chips" id="districts"></div>
+      <div class="chips" id="statuses"></div>
+      <div class="list" id="list"></div>
+    </section>
+  </main>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

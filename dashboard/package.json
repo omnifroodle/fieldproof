@@ -11,7 +11,8 @@
     "start": "node --env-file=.env server.js",
     "test": "node --test",
     "setup": "node --env-file=.env ../scripts/setup-cluster.mjs",
-    "reset": "node --env-file=.env ../scripts/reset-demo.mjs"
+    "reset": "node --env-file=.env ../scripts/reset-demo.mjs",
+    "tamper": "node --env-file=.env ../scripts/tamper.mjs"
   },
   "dependencies": {
     "couchbase": "4.7",

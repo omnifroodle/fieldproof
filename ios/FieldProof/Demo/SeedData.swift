@@ -34,8 +34,8 @@ enum SeedData {
         for (index, entry) in list.enumerated() {
             await progress(index, list.count)
             let base = (entry.file as NSString).deletingPathExtension
-            let id = "report::seed-\(base)"
-            if try repository.hasAnalyzedReport(id: id) { continue }
+            if try repository.hasSeed(file: entry.file) { continue }
+            let id = "report::seed-\(base)-\(UUID().uuidString.prefix(6).lowercased())"
             guard let url = Bundle.main.url(forResource: base, withExtension: "jpg"),
                   let photo = PreparedPhoto.from(sampleJPEG: try Data(contentsOf: url)) else { continue }
 
@@ -54,6 +54,7 @@ enum SeedData {
             report.ocrText = analysis.ocrText
             report.embedding = analysis.embedding
             report.seed = true
+            report.seedFile = entry.file
             try repository.save(report, photo: photo)
             written += 1
         }

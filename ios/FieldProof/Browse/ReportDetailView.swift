@@ -42,6 +42,9 @@ struct ReportDetailView: View {
                 .padding(Theme.Space.l)
             } else {
                 EmptyTrailView(message: "REPORT NOT ON THIS DEVICE", detail: "It may have been removed by a reset or a sync.")
+                Button("Back to reports") { dismiss() }
+                    .buttonStyle(PosterButtonStyle(kind: .outline))
+                    .padding(Theme.Space.l)
             }
         }
         .background(Theme.Palette.paper)
