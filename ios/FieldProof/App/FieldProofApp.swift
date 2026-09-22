@@ -6,22 +6,25 @@ struct FieldProofApp: App {
 
     // MARK: - State
 
-    private let database: Database
+    @StateObject private var state: AppState
 
     // MARK: - Init
 
     init() {
         // Talking point: the vector search extension is loaded once, before the database opens.
         try! Extension.enableVectorSearch()
-        database = try! DatabaseManager.open()
+        let database = try! DatabaseManager.open()
+        _state = StateObject(wrappedValue: try! AppState(database: database))
     }
 
     // MARK: - Scene
 
     var body: some Scene {
         WindowGroup {
-            SpikeView(database: database)
+            ReportListView()
+                .environmentObject(state)
                 .preferredColorScheme(.light)
+                .tint(Theme.Palette.sienna)
         }
     }
 }

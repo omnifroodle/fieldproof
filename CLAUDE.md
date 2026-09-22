@@ -18,17 +18,17 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **0 (spike) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 1.**
+Phase: **1 (local capture) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 2.**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- Works: Xcode project (hand-written, synchronized folders; no XcodeGen), SPM CBL EE 4.1.2 + vector search 2.0.0,
-  simulator and device builds, vector extension + collections + 768-dim cosine index, OCR, duplicate SQL++ query.
-- Works on iPhone 15 Pro Max (team 8R6V8R27NM): real vectors via Neural Engine; Mac vs device vectors agree (cos 2.4e-6).
-- Does not: Vision feature print / classification on the iOS 26.4 simulator (constant vector). Decision: precompute sample
-  vectors + labels on the Mac for the simulator (Phase 1). See REFERENCE.md §7.1.
-- Capella: bucket `demos`, scope `evidence`, 3 indexes online (PLAN §16). App Services endpoint `fieldproof` verified via
-  Public REST as app users: channels, sync function, rev/OCC, attachments. No admin credential is used (PLAN §16.4).
-- `Demo/Phase0Spike.swift` + `App/SpikeView.swift` are temporary; replace in Phase 1.
+- Works (simulator, observed): poster UI with bundled fonts; demo capture → hash → review → save offline; live list with
+  category/status filters; detail with full photo and hash Recompute (VERIFIED); Settings user picker, demo mode,
+  load 30 sample reports, reset local data; 10 unit tests pass (`xcodebuild test`, scheme FieldProof).
+- Device: builds, signs, installs on iPhone 15 Pro Max. Camera path not yet exercised (needs Matt with the phone).
+- Not yet: AI in capture/seed, duplicate check UI (Phase 2); sync (Phase 3). Vision does not work on the simulator;
+  sample vectors are precomputed on the Mac in Phase 2 (REFERENCE.md §7.1).
+- Samples: 33 CC0/PD photos in `Demo/Samples` (attribution in ATTRIBUTION.md), variants from `scripts/make-variants.swift`.
+- Swift is ~2,000 lines; budget ~3,000.
 - Device run: phone must be unlocked; `xcrun devicectl device process launch --console --device 00008130-00044CDE1422001C com.couchbase.demo.fieldproof`.
 - Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 

@@ -37,6 +37,17 @@ let p = Parameters(); p.setValue(…, forName:); p.setArray(…, forName:); q.pa
 for r in try q.execute() { r.string(forKey:), r.double(forKey:) }
 ```
 
+Also used from Phase 1 (checked against the 4.1.2 `.swiftinterface`, 2026-09-22):
+
+| API | Use | Source |
+|---|---|---|
+| `Blob(contentType:data:)`, `blob.content`, `doc.setBlob(_:forKey:)`, `doc.blob(forKey:)` | Thumbnail in the report doc, full photo in the photo doc | https://docs.couchbase.com/couchbase-lite/current/swift/blob.html |
+| `database.inBatch(using:)` | Save report + photo docs together | https://docs.couchbase.com/couchbase-lite/current/swift/document.html (Batch operations) |
+| `query.addChangeListener { change in change.results }` → `ListenerToken.remove()` | Live report list. Observed: the listener fires once right away with the current results, then on every change. | https://docs.couchbase.com/couchbase-lite/current/swift/query-live.html |
+| `database.collection(name:scope:)`, `collection.document(id:)`, `doc.toMutable()` | Read and update | https://docs.couchbase.com/couchbase-lite/current/swift/document.html |
+| `doc.removeValue(forKey:)`, `doc.contains(key:)` | Leave `embedding`/`attachedTo` out when empty | same |
+| `database.close()`, `Database.delete(withName:inDirectory:)` | Settings → Reset local data (live query tokens removed first) | https://docs.couchbase.com/couchbase-lite/current/swift/database.html |
+
 ## 2. Couchbase Lite Vector Search extension
 
 | Item | Value | Source |
