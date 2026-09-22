@@ -13,6 +13,7 @@ struct ReportDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var photo: Data?
     @State private var verified: Bool?
+    @State private var showSimilar = false
 
     private var report: Report? { state.reports.first { $0.id == reportId } }
 
@@ -25,11 +26,16 @@ struct ReportDetailView: View {
                     titleBar(report)
                     photoView(report)
                     EvidencePanel(report: report)
+                    links(report)
                     if !report.notes.isEmpty { section("NOTES", report.notes) }
                     if !report.aiLabels.isEmpty {
                         section("ON-DEVICE LABELS", report.aiLabels.map { "\($0.label) \(Int($0.confidence * 100))%" }.joined(separator: " · "))
                     }
                     if !report.ocrText.isEmpty { section("TEXT IN PHOTO", report.ocrText) }
+                    if !report.embedding.isEmpty {
+                        Button { showSimilar = true } label: { Label("Find similar", systemImage: "square.stack.3d.down.right") }
+                            .buttonStyle(PosterButtonStyle(kind: .outline))
+                    }
                     PosterDivider()
                     hashPanel(report)
                 }
@@ -40,6 +46,7 @@ struct ReportDetailView: View {
         }
         .background(Theme.Palette.paper)
         .toolbar(.hidden, for: .navigationBar)
+        .sheet(isPresented: $showSimilar) { if let report { SimilarReportsView(source: report) } }
         .task(id: report?.imageHash) {
             guard let report else { return }
             photo = try? state.repository.photoData(for: report)
@@ -87,6 +94,17 @@ struct ReportDetailView: View {
                     .background(Theme.Palette.mustard)
                     .padding(Theme.Space.s)
             }
+        }
+    }
+
+    /// Attached captures (on a parent) or the parent this capture was attached to.
+    @ViewBuilder
+    private func links(_ report: Report) -> some View {
+        if let parent = report.attachedTo {
+            section("ATTACHED CAPTURE", "Filed as extra evidence on \(parent.replacingOccurrences(of: "report::", with: "report ")).")
+        } else if !report.relatedReportIds.isEmpty {
+            let n = report.relatedReportIds.count
+            section("ATTACHED CAPTURES", "+\(n) attached capture\(n == 1 ? "" : "s") from crews who found the same problem.")
         }
     }
 

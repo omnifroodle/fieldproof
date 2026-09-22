@@ -14,5 +14,8 @@ struct AnalysisResult {
 
     let labels: [Label]
     let ocrText: String
+    /// 768 floats, or empty if no embedding could be made (then the duplicate check is skipped).
     let embedding: [Float]
+    /// True on the simulator: labels and embedding came from the Mac precompute, not a live model run.
+    let precomputed: Bool
 }

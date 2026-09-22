@@ -18,17 +18,15 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **1 (local capture) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 2.**
+Phase: **2 (AI + duplicate check) — complete on the simulator 2026-09-22; device acceptance run pending (Matt).**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- Works (simulator, observed): poster UI with bundled fonts; demo capture → hash → review → save offline; live list with
-  category/status filters; detail with full photo and hash Recompute (VERIFIED); Settings user picker, demo mode,
-  load 30 sample reports, reset local data; 10 unit tests pass (`xcodebuild test`, scheme FieldProof).
-- Device: builds, signs, installs on iPhone 15 Pro Max. Camera path not yet exercised (needs Matt with the phone).
-- Not yet: AI in capture/seed, duplicate check UI (Phase 2); sync (Phase 3). Vision does not work on the simulator;
-  sample vectors are precomputed on the Mac in Phase 2 (REFERENCE.md §7.1).
-- Samples: 33 CC0/PD photos in `Demo/Samples` (attribution in ATTRIBUTION.md), variants from `scripts/make-variants.swift`.
-- Swift is ~2,000 lines; budget ~3,000.
+- Works (simulator, observed): seeding with analysis; capture → READING THE SCENE → LOOKS FAMILIAR sheet (capture-pothole:
+  2 open reports, 98 %, 39 m / 75 m; resolved 01c excluded) → attach (parent shows +1 attached); graffiti capture: no
+  candidates; Find similar (2 km, any status); Settings → Developer shows exact distances. 10 unit tests pass.
+- Threshold 0.15 (REFERENCE.md §7.2). Simulator uses `Demo/Samples/analysis.json` from `scripts/embed-samples.swift`.
+- Device: built and installed; live Vision flow not yet exercised on the phone.
+- Swift ~2,500 lines of ~3,000.
 - Device run: phone must be unlocked; `xcrun devicectl device process launch --console --device 00008130-00044CDE1422001C com.couchbase.demo.fieldproof`.
 - Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 

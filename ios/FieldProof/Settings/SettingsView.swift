@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var seeding: (done: Int, total: Int)?
     @State private var message: String?
     @State private var confirmReset = false
+    @State private var showDeveloper = false
 
     // MARK: - Body
 
@@ -73,6 +74,16 @@ struct SettingsView: View {
                     }
                 }
 
+                heading("DEVELOPER")
+                PosterCard {
+                    VStack(alignment: .leading, spacing: Theme.Space.s) {
+                        Text("Duplicate threshold \(DuplicateCheckQuery.defaultMaxDistance, specifier: "%.2f") (cosine distance), radius 200 m.")
+                            .font(Theme.Typeface.body(14)).foregroundStyle(Theme.Palette.charcoal)
+                        Button("Last duplicate check") { showDeveloper = true }
+                            .buttonStyle(PosterButtonStyle(kind: .outline))
+                    }
+                }
+
                 if let message {
                     Text(message).font(Theme.Typeface.body(14)).foregroundStyle(Theme.Palette.pine)
                 }
@@ -80,6 +91,7 @@ struct SettingsView: View {
             .padding(Theme.Space.l)
         }
         .background(Theme.Palette.paper)
+        .sheet(isPresented: $showDeveloper) { DeveloperView() }
         .confirmationDialog("Delete every report on this phone?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Delete local data", role: .destructive) { reset() }
         } message: {

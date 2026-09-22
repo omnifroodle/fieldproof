@@ -19,6 +19,12 @@ enum DuplicateCheckQuery {
         let meters: Double           // exact distance from the capture point
     }
 
+    // MARK: - Tuning
+
+    /// Cosine distance below which two photos count as "the same problem". Tuned in Phase 2 on the sample set:
+    /// near-duplicates score 0.01–0.10, different subjects 0.12 and up (docs/REFERENCE.md §7.2).
+    static let defaultMaxDistance = 0.15
+
     // MARK: - SQL++
 
     private static let sql = """
@@ -56,7 +62,7 @@ enum DuplicateCheckQuery {
         lat: Double,
         lon: Double,
         radiusMeters: Double = 200,
-        maxDistance: Double = 0.35,
+        maxDistance: Double = defaultMaxDistance,
         excludeId: String? = nil,
         includeResolved: Bool = false,
         limit: Int = 5

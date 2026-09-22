@@ -50,6 +50,14 @@ final class ReportRepository {
             photoDoc.setInt(photo.jpeg.count, forKey: "byteLength")
             photoDoc.setBlob(Blob(contentType: "image/jpeg", data: photo.jpeg), forKey: "photo")
             try photos.save(document: photoDoc)
+
+            // Attached capture: the parent report lists it, so the dashboard can show "+1 attached capture".
+            if let parentId = report.attachedTo, let parent = try reports.document(id: parentId)?.toMutable() {
+                let related = parent.array(forKey: "relatedReportIds") ?? MutableArrayObject()
+                if !(related.toArray() as? [String] ?? []).contains(report.id) { related.addString(report.id) }
+                parent.setArray(related, forKey: "relatedReportIds")
+                try reports.save(document: parent)
+            }
         }
     }
 
@@ -68,6 +76,35 @@ final class ReportRepository {
     func hasAnalyzedReport(id: String) throws -> Bool {
         guard let doc = try reports.document(id: id) else { return false }
         return doc.array(forKey: "embedding") != nil
+    }
+
+    // MARK: - Similar reports
+
+    /// Runs the duplicate check query, then loads each hit for its thumbnail and the exact distance to show.
+    func similar(
+        to embedding: [Float], lat: Double, lon: Double, radiusMeters: Double = 200,
+        maxDistance: Double = DuplicateCheckQuery.defaultMaxDistance, excludeId: String? = nil, includeResolved: Bool = false
+    ) throws -> [SimilarReport] {
+        guard !embedding.isEmpty else { return [] }
+        let hits = try DuplicateCheckQuery.run(
+            in: database, embedding: embedding, lat: lat, lon: lon, radiusMeters: radiusMeters,
+            maxDistance: maxDistance, excludeId: excludeId, includeResolved: includeResolved
+        )
+        return try hits.compactMap { hit in
+            guard let report = try report(id: hit.id) else { return nil }
+            return SimilarReport(report: report, distance: Embedding.cosineDistance(embedding, report.embedding), meters: hit.meters)
+        }
+    }
+
+    /// Every analyzed report with its exact distance to `embedding` (Developer screen, for tuning the threshold).
+    func allDistances(to embedding: [Float], lat: Double, lon: Double) throws -> [SimilarReport] {
+        let query = try database.createQuery("SELECT META().id AS id FROM evidence.reports WHERE type = 'report' AND embedding IS VALUED")
+        return try query.execute().compactMap { row in
+            guard let id = row.string(forKey: "id"), let report = try report(id: id) else { return nil }
+            let meters = GeoBox.meters(lat1: lat, lon1: lon, lat2: report.location.lat, lon2: report.location.lon)
+            return SimilarReport(report: report, distance: Embedding.cosineDistance(embedding, report.embedding), meters: meters)
+        }
+        .sorted { $0.distance < $1.distance }
     }
 
     // MARK: - Live list

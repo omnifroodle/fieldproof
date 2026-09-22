@@ -688,3 +688,6 @@ export async function verifyReport(id) {
    - Users and channels are created once in the Capella UI; the admin credential can be deleted after setup.
    - Demo line for the tamper beat: "even someone with valid access who swaps the photo is caught, because the hash was
      computed on the device at capture."
+5. **Duplicate threshold 0.15** (not 0.35), measured in Phase 2; see REFERENCE.md §7.2.
+6. **Simulator AI in practice:** `ImageAnalyzer` uses `Demo/Samples/analysis.json` (keyed by SHA-256) for labels and embeddings on the
+   simulator only, and runs OCR live. The review screen says so. Rerun `swift scripts/embed-samples.swift` after changing samples.

@@ -25,12 +25,17 @@ struct ReportRow: View {
                         .font(Theme.Typeface.body(14))
                         .foregroundStyle(Theme.Palette.charcoal)
                         .lineLimit(2)
-                    Text("\(report.createdAt.formatted(.relative(presentation: .named))) · \(report.district.capitalized)")
+                    Text("\(report.createdAt.formatted(.relative(presentation: .named))) · \(report.district.capitalized)\(links)")
                         .font(Theme.Typeface.label(13))
                         .foregroundStyle(Theme.Palette.pineLight)
                 }
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    private var links: String {
+        if report.attachedTo != nil { return " · attached capture" }
+        return report.relatedReportIds.isEmpty ? "" : " · +\(report.relatedReportIds.count) attached"
     }
 }

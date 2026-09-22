@@ -26,6 +26,7 @@ enum SeedData {
     // MARK: - Load
 
     /// Creates each seed report unless it already exists with an embedding. Returns how many were written.
+    /// Each photo goes through the same on-device analysis as a capture (precomputed on the simulator).
     /// Ids are deterministic (`report::seed-pothole-01`), so running it twice does not duplicate anything.
     static func load(into repository: ReportRepository, deviceId: String, progress: @escaping @MainActor (Int, Int) -> Void) async throws -> Int {
         let list = try entries()
@@ -48,6 +49,10 @@ enum SeedData {
                                           altitude: entry.district == "tuolumne" ? 2620 : 1210, heading: entry.heading),
                 notes: entry.notes, imageHash: photo.hash, thumbnail: photo.thumbnail
             )
+            let analysis = try await ImageAnalyzer.analyze(jpeg: photo.jpeg, hash: photo.hash)
+            report.aiLabels = analysis.labels
+            report.ocrText = analysis.ocrText
+            report.embedding = analysis.embedding
             report.seed = true
             try repository.save(report, photo: photo)
             written += 1

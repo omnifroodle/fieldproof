@@ -12,6 +12,8 @@ final class AppState: ObservableObject {
     @Published var user: AppUser {
         didSet { UserDefaults.standard.set(user.rawValue, forKey: Keys.user) }
     }
+    /// Last duplicate check, shown on Settings → Developer to tune the threshold.
+    @Published var lastCheck: DuplicateCheckRun?
     @Published var demoMode: Bool {
         didSet { UserDefaults.standard.set(demoMode, forKey: Keys.demoMode) }
     }

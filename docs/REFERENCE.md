@@ -178,3 +178,21 @@ Environment used (2026-09-22): macOS 27.0 (Apple Silicon), Xcode 27.0 (27A266a),
 | **`CouchbaseLiteVectorSearch` has no Swift module** (the xcframework has no `Modules/`). `import CouchbaseLiteVectorSearch` does not compile. It is loaded at runtime by `Extension.enableVectorSearch()`; linking and embedding it via SPM is enough. The package zip also contains a `Build -> .` symlink, which makes SPM print a long "multiple potential binary artifacts" warning. Harmless. | Artifact inspection | Do not import it (PLAN Appendix A.1 is wrong on this line). |
 | **Logging API in 4.x** is `LogSinks.console = ConsoleLogSink(level: .info, domains: .all)` (not `Database.log.console`). | https://docs.couchbase.com/couchbase-lite/current/swift/new-logging-api.html , `.swiftinterface` | Used in `DatabaseManager`. |
 | **Vision ML models do not work on the iOS 26.4 Simulator.** By default `VNGenerateImageFeaturePrintRequest` and `VNClassifyImageRequest` fail with "Failed to create espresso context". Pinning to the CPU with `VNRequest.setComputeDevice(_:for:)` (iOS 17+, `MLComputeDevice.cpu`, stages from `supportedComputeStageDevices`) makes them run, but **every image returns the same feature print** (cosine distance 0.0000 between a road and a forest scene) and nonsense labels (`night_sky`, `moon`). The simulated GPU (`MLGPUComputeDevice "Apple iOS simulator GPU"`) also fails. `VNRecognizeTextRequest` (OCR) works on the simulator. On macOS 27, the same revision-2 feature print gives distinct vectors (distances 0.23–0.41 for the same test scenes). | Simulator probe in `Demo/Phase0Spike.swift`; macOS check with a Vision CLI; https://developer.apple.com/documentation/vision/vnrequest/setcomputedevice(_:for:) | Needs a decision from Matt: see the Phase 0 report. |
+
+### 7.2 Duplicate threshold (Phase 2, 2026-09-22)
+
+Measured with Vision feature print revision 2 on the bundled samples (`scripts/embed-samples.swift`, cosine distance):
+
+| Pair | Distance |
+|---|---|
+| `capture-pothole` vs `pothole-01` / `pothole-01b` (crops, hue shift) | 0.019 / 0.020 |
+| `pothole-01` vs `pothole-01c` (3° rotation, +8% brightness) | 0.092 (capture vs 01c: 0.102) |
+| Closest different subjects, same category (two fallen trees) | 0.124 |
+| Different potholes | 0.18–0.31 |
+| Other captures vs anything (graffiti, sign) | 0.23 and up |
+
+**Chosen: 0.15** (`DuplicateCheckQuery.defaultMaxDistance`), with the 200 m geo box. The plan's starting value 0.35 matched different
+potholes. Re-check with real re-photographs on a device (Settings → Developer → Last duplicate check) before a customer demo.
+
+Classification note: `VNClassifyImageRequest` has no pavement labels; close-up potholes score under 0.1 on everything
+(top guesses include `liquid`, `water`, and at 0.057 `alligator_crocodile`). The 0.1 cutoff stays; the crew member picks the category.
