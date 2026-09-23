@@ -23,6 +23,7 @@ async function load() {
     ['Heading', `${Math.round(loc.heading ?? 0)}° · ${Math.round(loc.altitude ?? 0)} m elevation`],
     ['District', esc(r.district)],
     ['Filed by', esc(r.createdBy)],
+    ...(r.summary ? [['Written on the device', esc(r.summary)]] : []),
     ['Notes', esc(r.notes) || '—'],
     ['ID', `<span class="mono">${esc(r.id)}</span>`],
     ...(r.attachedTo ? [['Attached to', `<a href="report.html?id=${encodeURIComponent(r.attachedTo)}">${esc(r.attachedTo)}</a>`]] : []),

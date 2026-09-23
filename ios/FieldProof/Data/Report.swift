@@ -27,6 +27,8 @@ struct Report: Identifiable, Equatable {
     var aiLabels: [AnalysisResult.Label] = []
     var ocrText = ""
     var notes = ""
+    /// One sentence written on the device by Apple's language model; empty when the model cannot run.
+    var summary = ""
     var embedding: [Float] = []
     var imageHash: String
     var thumbnail: Data?
@@ -76,6 +78,7 @@ struct Report: Identifiable, Equatable {
         }
         ocrText = document.string(forKey: "ocrText") ?? ""
         notes = document.string(forKey: "notes") ?? ""
+        summary = document.string(forKey: "summary") ?? ""
         embedding = (document.array(forKey: "embedding")?.toArray() as? [NSNumber] ?? []).map(\.floatValue)
         imageHash = document.string(forKey: "imageHash") ?? ""
         thumbnail = document.blob(forKey: "thumbnail")?.content
@@ -119,6 +122,7 @@ struct Report: Identifiable, Equatable {
         doc.setArray(MutableArrayObject(data: aiLabels.map { ["label": $0.label, "confidence": $0.confidence] }), forKey: "aiLabels")
         doc.setString(ocrText, forKey: "ocrText")
         doc.setString(notes, forKey: "notes")
+        if summary.isEmpty { doc.removeValue(forKey: "summary") } else { doc.setString(summary, forKey: "summary") }
         // No embedding yet means "not analyzed": leave the key out so the vector index skips the document.
         if embedding.isEmpty {
             doc.removeValue(forKey: "embedding")

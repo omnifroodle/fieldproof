@@ -37,3 +37,8 @@ export const getAttachment = (ks, id, property) => call('GET', `${docPath(ks, id
 
 export const putAttachment = (ks, id, property, bytes, rev, type = 'image/jpeg') =>
   call('PUT', `${docPath(ks, id)}/${blobName(property)}?rev=${encodeURIComponent(rev)}`, { body: bytes, type });
+
+/** Talking point: App Services' changes feed. With `feed=longpoll` the request stays open until a document
+ *  actually changes, so the dashboard reacts to a phone's sync instead of asking Capella every few seconds. */
+export const changes = (ks, since = '0', timeoutMs = 25_000) =>
+  call('GET', `/${ks}/_changes?feed=longpoll&since=${encodeURIComponent(since)}&timeout=${timeoutMs}`);

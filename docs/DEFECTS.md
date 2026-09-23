@@ -10,6 +10,7 @@ Status: **open**, **deferred** (accepted for the demo), or **fixed** (with the c
 | D3 | No swipe-back gesture on the report detail screen | iOS / UX | open | 2026-09-22, Phase 5 |
 | D4 | Running the unit tests syncs the app to Capella | iOS / tests | open | 2026-09-22, Phase 5 |
 | D5 | Dashboard never recovers from a failed first connection to Capella | dashboard | open | 2026-09-22, Phase 6 |
+| D6 | One held longpoll per open dashboard, with no cap | dashboard | deferred | 2026-09-22, Phase 7 |
 
 ---
 
@@ -112,3 +113,20 @@ clusterPromise = couchbase.connect(...).catch((e) => { clusterPromise = undefine
 
 Worth doing before a customer demo: the failure looks exactly like "Capella is down" when it is not, and the
 recovery (restart the server) is not obvious from the error. Noted in `docs/demo-guide.md` under recovery.
+
+## D6 — One held longpoll per open dashboard, with no cap
+
+**What it is.** `GET /api/stream` runs a loop per connected browser: each iteration holds a 25-second longpoll
+against the App Services `_changes` feed for `evidence.reports`, then writes a server-sent event. Two people
+watching the dashboard means two held requests to App Services; twenty means twenty.
+
+**Why it is fine for the demo.** One or two viewers, one App Endpoint, and the alternative it replaced (a
+SQL++ query every three seconds per viewer) was worse.
+
+**What a real deployment would do.** Hold **one** feed per collection in the server, fan the events out to all
+connected clients, and reconnect with backoff when it drops. That is a small change — a single async loop
+writing to a set of response objects — and it also fixes the case where a stalled feed affects only one viewer.
+Also worth adding: a cap on connected clients, and `Last-Event-ID` support so a reconnecting browser resumes
+from its own sequence instead of `0`.
+
+Accepted for the demo, deliberately: see `docs/architecture/dashboard-and-capella.md`.

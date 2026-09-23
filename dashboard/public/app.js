@@ -77,4 +77,10 @@ async function load() {
 
 render();
 load();
-setInterval(load, 3000);
+
+// Talking point: the server holds a longpoll on the App Services changes feed, so a report a phone just
+// synced lands on this map in about a second. The slow interval is only a safety net if the stream drops.
+const stream = new EventSource('/api/stream');
+let coalesce;                                   // a burst of 30 seeded reports is one redraw, not thirty
+stream.onmessage = () => { clearTimeout(coalesce); coalesce = setTimeout(load, 400); };
+setInterval(load, 15000);

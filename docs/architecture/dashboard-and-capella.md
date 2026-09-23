@@ -53,6 +53,14 @@ collections and three indexes (`idx_reports_list` on `district, status, createdA
 **Connection.** One connection string, one database credential, `configProfile: 'wanDevelopment'` for laptop-to-
 cloud latency. The SDK finds every node from there.
 
+**Live updates, not polling** (Phase 7). The server holds a longpoll on the App Services `_changes` feed for
+the reports collection and pushes a server-sent event to each open dashboard, which refetches. Measured: a
+report filed on the phone reaches an open dashboard in about **3 seconds**, and the 15-second interval that
+remains is only a fallback if the stream drops. Two details found by doing it: `since=now` is rejected
+("Invalid sequence") so the first poll starts at `since=0` and takes the `last_seq` it hands back, and the feed
+emits one event per document — seeding 30 reports fired 30 events, so the browser coalesces them with a
+400 ms timer (`docs/REFERENCE.md` §7.5).
+
 **Housekeeping worth knowing.** `_all_docs` is disabled on the Capella Public REST API, so `reset-demo.mjs` gets
 its ids from SQL++ instead, and skips the internal documents App Services keeps in the same collections:
 `SUBSTR(META().id, 0, 6) != "_sync:"`. Deleting those would break the endpoint's own bookkeeping.
@@ -69,8 +77,6 @@ its ids from SQL++ instead, and skips the internal documents App Services keeps 
 
 ## Possible enhancements
 
-- **Live updates** from the App Services `_changes` feed with `feed=longpoll` instead of polling, so pins appear
-  the instant they sync.
 - **Capella Columnar** for trend analysis — repeat locations, time to resolution, seasonal patterns — without
   touching the operational cluster.
 - **Eventing** to notify a duty supervisor when a report arrives in a category and district that matter.
@@ -89,6 +95,6 @@ its ids from SQL++ instead, and skips the internal documents App Services keeps 
 | **Do everything through App Services REST** | One credential and one protocol, but no query engine: no filtering, ordering, aggregation or joins. The map would be built in JavaScript over `_all_docs`. |
 | **Do everything through SQL++** | You can read the documents, but writing a status this way bypasses the sync function and its validation, and the change has to find its way into the sync metadata before phones see it. Write through App Services. |
 | **A React/Vue build step** | Nicer to grow; one more thing to install, build and explain in a demo whose point is elsewhere. |
-| **Polling every few seconds (today)** | Trivial and predictable, and it costs a query per interval per viewer. The changes feed is the upgrade. |
+| **Polling every few seconds** (what this started as) | Trivial and predictable, and it costs a query per interval per viewer. The changes feed replaced it; the cost is one held connection per open dashboard. |
 
 Related: [sync-and-app-services](sync-and-app-services.md) · [evidence-integrity](evidence-integrity.md)

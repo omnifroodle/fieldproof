@@ -64,6 +64,28 @@ app.post('/api/reports/:id/status', route(async (req, res) => {
   res.json({ id: req.params.id, status, rev: result.rev });
 }));
 
+// Talking point: one longpoll per open dashboard, held against App Services. The browser is told
+// "something changed" and refetches; nothing polls Capella on a timer.
+app.get('/api/stream', async (req, res) => {
+  res.set({ 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+  res.flushHeaders();
+  let since = req.query.since ?? '0';   // the first poll returns at once and hands back the current sequence
+  let open = true;
+  req.on('close', () => { open = false; });
+  while (open) {
+    try {
+      const feed = await appservices.changes(appservices.keyspace('reports'), since);
+      since = feed.last_seq ?? since;
+      res.write(feed.results?.length ? `data: ${feed.results.length}\n\n` : ': waiting\n\n');
+    } catch (err) {
+      if (!open) break;
+      res.write(`event: stalled\ndata: ${err.message}\n\n`);
+      await new Promise((done) => setTimeout(done, 5000));
+    }
+  }
+  res.end();
+});
+
 const port = Number(process.env.PORT ?? 3000);
 const server = app.listen(port, () => console.log(`FieldProof dashboard on http://localhost:${port}`));
 

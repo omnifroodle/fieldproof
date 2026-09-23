@@ -289,6 +289,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = FieldProof;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FieldProof photographs the problem you are reporting.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FieldProof records where each report was taken.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "FieldProof records a spoken note for a report.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "FieldProof turns your spoken note into text on this device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -318,6 +320,8 @@
 				INFOPLIST_KEY_CFBundleDisplayName = FieldProof;
 				INFOPLIST_KEY_NSCameraUsageDescription = "FieldProof photographs the problem you are reporting.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "FieldProof records where each report was taken.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "FieldProof records a spoken note for a report.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "FieldProof turns your spoken note into text on this device.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;

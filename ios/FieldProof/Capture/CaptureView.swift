@@ -26,6 +26,9 @@ struct CaptureView: View {
     @State private var showDuplicates = false
     @State private var attachTo: Report?
     @State private var error: String?
+    @State private var summary: String?
+    @State private var summarizing = false
+    @StateObject private var voice = VoiceNotes()
 
     private let radiusMeters = 200.0
 
@@ -107,6 +110,20 @@ struct CaptureView: View {
                     .padding(Theme.Space.s)
                     .background(Theme.Palette.chalk, in: RoundedRectangle(cornerRadius: Theme.Radius.chip))
                     .overlay(RoundedRectangle(cornerRadius: Theme.Radius.chip).stroke(Theme.Palette.charcoal, lineWidth: 1.5))
+                HStack(spacing: Theme.Space.m) {
+                    Button(voice.isRecording ? "Stop dictating" : "Dictate the note") { voice.toggle() }
+                        .buttonStyle(PosterButtonStyle(kind: .outline))
+                        .fixedSize()
+                    if voice.isRecording {
+                        Text("LISTENING · ON THIS DEVICE").font(Theme.Typeface.label(13)).foregroundStyle(Theme.Palette.sienna)
+                    }
+                }
+                if let trouble = voice.trouble {
+                    Text(trouble).font(Theme.Typeface.body(13)).foregroundStyle(Theme.Palette.pineLight)
+                }
+                if voice.isRecording, !voice.heard.isEmpty {
+                    Text(voice.heard).font(Theme.Typeface.body(14)).foregroundStyle(Theme.Palette.pineLight)
+                }
                 if let error { Text(error).font(Theme.Typeface.body(14)).foregroundStyle(Theme.Palette.sienna) }
                 if !duplicates.isEmpty {
                     Button("Review \(duplicates.count) similar report\(duplicates.count == 1 ? "" : "s")") { showDuplicates = true }
@@ -123,6 +140,11 @@ struct CaptureView: View {
         }
         .background(Theme.Palette.paper)
         .scrollDismissesKeyboard(.interactively)
+        .onChange(of: voice.isRecording) { _, recording in
+            guard !recording, !voice.heard.isEmpty else { return }
+            notes = notes.isEmpty ? voice.heard : notes + " " + voice.heard
+        }
+        .onDisappear { voice.stop() }
     }
 
     private func aiCard(_ analysis: AnalysisResult) -> some View {
@@ -134,6 +156,11 @@ struct CaptureView: View {
                 fact("Text", analysis.ocrText.isEmpty ? "None found" : analysis.ocrText.replacingOccurrences(of: "\n", with: " / "))
                 fact("Vector", analysis.embedding.isEmpty ? "Not available" : "\(analysis.embedding.count) floats")
                 fact("Nearby", duplicates.isEmpty ? "No similar open reports" : "\(duplicates.count) similar open report\(duplicates.count == 1 ? "" : "s")")
+                fact("Summary", ReportSummary.unavailableReason ?? (summarizing ? "Writing…" : (summary ?? "—")))
+                if ReportSummary.isAvailable, !notes.isEmpty, !summarizing {
+                    Button("Rewrite with my note") { makeSummary(analysis) }
+                        .font(Theme.Typeface.label(13)).foregroundStyle(Theme.Palette.pineLight)
+                }
                 if analysis.precomputed {
                     Text("Simulator: labels and vector were computed on a Mac with the same Vision model.")
                         .font(Theme.Typeface.body(12)).foregroundStyle(Theme.Palette.pineLight)
@@ -171,6 +198,19 @@ struct CaptureView: View {
             checkForDuplicates(analysis)
             step = .review(photo, analysis)
             showDuplicates = !duplicates.isEmpty
+            makeSummary(analysis)
+        }
+    }
+
+    /// Talking point: a third model on the phone. Apple's language model writes the one-line title from the
+    /// report's own facts, beside Vision and the database, with nothing sent anywhere.
+    private func makeSummary(_ analysis: AnalysisResult) {
+        guard ReportSummary.isAvailable else { return }
+        summarizing = true
+        Task {
+            summary = await ReportSummary.write(
+                category: category, labels: analysis.labels, ocrText: analysis.ocrText, notes: notes)
+            summarizing = false
         }
     }
 
@@ -193,6 +233,7 @@ struct CaptureView: View {
         )
         report.aiLabels = analysis.labels
         report.ocrText = analysis.ocrText
+        report.summary = summary ?? ""
         report.embedding = analysis.embedding
         if let parent {
             // Evidence is never dropped: the new capture is saved and linked to the report it duplicates.

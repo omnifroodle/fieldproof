@@ -57,6 +57,18 @@ A 30-second clip of the offline capture through to the duplicate check is in
 
 ---
 
+## Three optional beats (Phase 7)
+
+Use them when the audience asks "what else can the phone do?" — not inside the five minutes.
+
+| Beat | Where | What to say | Watch out |
+|---|---|---|---|
+| **Dictate the note** | Review screen, under NOTES | "Gloves on, no signal. `requiresOnDeviceRecognition` keeps the audio on the phone." | **Device only.** The simulator answers "Failed to initialize recognizer". Apple's permission alert claims speech is sent to Apple — that is the system's generic text, not what this request does. |
+| **The one-line summary** | Review screen, ON-DEVICE AI → SUMMARY | "Apple's language model wrote that sentence from the report's own facts, on the phone." | **Device only**, and about 4.5 s, so it appears while you are talking. On the simulator the card says so plainly. |
+| **The dashboard updates itself** | Dashboard, while you file a report | "No polling. The server is holding a longpoll on the App Services changes feed." | Measured at about 3 seconds from filing to the pin appearing. |
+
+---
+
 ## When it goes wrong
 
 | Symptom | What happened | Recovery, on stage |
@@ -69,6 +81,7 @@ A 30-second clip of the offline capture through to the duplicate check is in
 | The photo has not synced when you hit Verify | Reports arrive before photos by design | Wait a few seconds and press Verify again, and say why: "metadata first, pixels second — the map does not wait for the photograph." |
 | Tapping a control does nothing | A sheet scrolled since you last looked | Look before you tap. This is the most common failure in rehearsal, and it is the presenter, not the app. |
 | Phone list does not update after a status change | Rare; the change listener normally lands in a few seconds | Pull the list, or open and close the report. |
+| Dashboard stops updating by itself | The event stream dropped | It refetches every 15 seconds regardless, so the demo continues; reload the page to reconnect. |
 
 ---
 

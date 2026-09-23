@@ -16,6 +16,10 @@ facilities, construction, or inspections.
 1. Works with no signal. 2. AI runs on the device. 3. Duplicate check before saving. 4. Trustworthy evidence
 (SHA-256 at capture). 5. Syncs when back online, scoped per district by channel.
 
+Three more, added later and shown on request: a **dictated note** transcribed on the phone, a **one-line summary**
+written by Apple's on-device language model, and a dashboard that **updates itself** from the App Services changes
+feed instead of polling. The first two need a real device (`docs/REFERENCE.md` §7.5).
+
 | | |
 |---|---|
 | iOS app | SwiftUI, Couchbase Lite Swift Enterprise 4.1.2 + Vector Search 2.0.0 |

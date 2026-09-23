@@ -27,6 +27,7 @@ struct ReportDetailView: View {
                     photoView(report)
                     EvidencePanel(report: report)
                     links(report)
+                    if !report.summary.isEmpty { section("WRITTEN ON THE DEVICE", report.summary) }
                     if !report.notes.isEmpty { section("NOTES", report.notes) }
                     if !report.aiLabels.isEmpty {
                         section("ON-DEVICE LABELS", report.aiLabels.map { "\($0.label) \(Int($0.confidence * 100))%" }.joined(separator: " · "))

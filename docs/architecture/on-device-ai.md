@@ -1,7 +1,7 @@
 # On-device AI
 
-Three models run on the phone for every capture, with the radio off: a classifier, a text recogniser,
-and an image embedder. Measured on an iPhone, a full analysis takes **257–323 ms** (`docs/REFERENCE.md` §7).
+Up to five models run on the phone, with the radio off: a classifier, a text recogniser and an image
+embedder on every capture, plus speech recognition and a language model when the crew member asks for them. Measured on an iPhone, a full analysis takes **257–323 ms** (`docs/REFERENCE.md` §7).
 Nothing is uploaded to get them.
 
 ```mermaid
@@ -83,14 +83,47 @@ in Capella — is the architecture, not an optimisation.
 - "The AI is supporting evidence. If a model fails, the report is still filed, hashed and synced."
 - "Every phone you add brings its own inference capacity with it. That is not true of a cloud API."
 
+## Two more models, added in Phase 7
+
+**A spoken note** (`AI/VoiceNotes.swift`). `SFSpeechRecognizer` with
+`request.requiresOnDeviceRecognition = true` — the one line that keeps the audio on the phone. The review
+screen gets a "Dictate the note" button; partial results appear as the crew member speaks, and the text is
+appended to the note when they stop. Gloves on, no typing, no signal.
+
+> The simulator cannot do this: with both permissions granted it fails with "Failed to initialize recognizer"
+> (`docs/REFERENCE.md` §7.5). Demonstrate dictation on a device. Note also that Apple's own permission alert
+> says speech data "will be sent to Apple" — that is the system's generic text; `requiresOnDeviceRecognition`
+> is what governs it.
+
+**A one-line summary** (`AI/ReportSummary.swift`). Apple's Foundation Models write the report's title from
+its own facts — category, labels, recognised text, the crew member's note:
+
+```swift
+let session = LanguageModelSession(instructions: instructions)
+let response = try await session.respond(
+    to: facts, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 40))
+```
+
+Measured on an iPhone 15 Pro Max: **4.455 s** for a sentence (`ReportSummaryTests`, run on the device). That is
+slow enough to matter, so it runs in the background while the review screen is on screen, and the report is
+filed with or without it. Example output, from the same prompt on macOS: *"Tree across far lane on bridge
+approach."*
+
+The simulator reports the model as available and then fails to generate, because its safety assets are not
+installed, so the app says so on screen rather than pretending (§7.5). `ReportSummaryTests` skips on the
+simulator and runs on a device, which makes it the quickest way to check Apple Intelligence on real hardware.
+
+Both are guarded: the report is filed even when the model is missing, refuses, or is switched off. AI is
+supporting evidence here, never a gate.
+
 ## Possible enhancements
 
 - **A custom classifier trained with Create ML** on the customer's own categories (pothole, spalling, corrosion,
   graffiti, vegetation) and dropped in as a Core ML model. This is the direct answer to the weak generic labels,
   and it is a day of work if the customer has labelled photographs.
-- **Apple Foundation Models** (iOS 26, recent hardware) for a one-sentence summary of category, labels, OCR and
-  notes — still on the device. Guard with `#available` and an availability check.
-- **Speech framework** for voice notes when gloves are on, transcribed locally.
+- **Structured generation** with Foundation Models (`@Generable`) so the model fills a typed struct — severity,
+  access notes, suggested trade — instead of a sentence.
+- **A prompt in the crew member's language**, with the summary written in the language the supervisor reads.
 - **Depth or LiDAR** on Pro devices to estimate the size of a defect rather than describing it.
 - **Android parity** with ML Kit or TFLite and Couchbase Lite for Android; the document model does not change.
 
