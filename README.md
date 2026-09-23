@@ -162,7 +162,28 @@ dashboard/             Express server, lib/couchbase.js (SQL++), lib/appservices
 scripts/               setup-cluster, reset-demo, tamper, embed-samples, make-variants
 appservices/           the two sync functions to paste into Capella
 docs/                  PLAN.md, REFERENCE.md (verified APIs + findings), STYLE-GUIDE.md, DEFECTS.md
+  architecture/        one document per component: overview, couchbase-lite, vector-search-on-device,
+                       on-device-ai, sync-and-app-services, evidence-integrity, dashboard-and-capella
+  demo-guide.md        the presenter's copy of the 5-minute script, with recovery moves
+  style-as-built.md    the poster style as built, with screenshots
+  images/screens/      screenshots · images/video/ a 30-second clip of the offline capture
 ```
+
+## 8. Going deeper
+
+| Document | What it covers |
+|---|---|
+| [docs/architecture/overview.md](docs/architecture/overview.md) | The system, the data flow, the document model, the five beats mapped to code |
+| [docs/architecture/couchbase-lite.md](docs/architecture/couchbase-lite.md) | The embedded database: collections, blobs, batches, indexes, change listeners |
+| [docs/architecture/vector-search-on-device.md](docs/architecture/vector-search-on-device.md) | The index, the query, and how the 0.15 threshold was measured |
+| [docs/architecture/on-device-ai.md](docs/architecture/on-device-ai.md) | Vision on the phone, and what it costs to run AI at the edge instead of in the cloud |
+| [docs/architecture/sync-and-app-services.md](docs/architecture/sync-and-app-services.md) | Channels, the sync function, users, the two REST APIs |
+| [docs/architecture/evidence-integrity.md](docs/architecture/evidence-integrity.md) | Hashing at capture, verification, and what tampering looks like |
+| [docs/architecture/dashboard-and-capella.md](docs/architecture/dashboard-and-capella.md) | SQL++, indexes, consistency, and why two data paths |
+| [docs/demo-guide.md](docs/demo-guide.md) | The presenter's script: what to click, what to say, what to do when it breaks |
+| [docs/style-as-built.md](docs/style-as-built.md) | The poster style as built, with screenshots |
+
+---
 
 Sample photos are public domain or CC0 with attribution in `ios/FieldProof/Demo/Samples/ATTRIBUTION.md`.
 Bundled fonts are SIL Open Font License; see `ios/FieldProof/Design/Fonts/FONTS.md`.

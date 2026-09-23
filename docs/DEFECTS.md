@@ -9,6 +9,7 @@ Status: **open**, **deferred** (accepted for the demo), or **fixed** (with the c
 | D2 | App user passwords are bundled in the iOS app | iOS / security | open | 2026-09-22, Phase 0 |
 | D3 | No swipe-back gesture on the report detail screen | iOS / UX | open | 2026-09-22, Phase 5 |
 | D4 | Running the unit tests syncs the app to Capella | iOS / tests | open | 2026-09-22, Phase 5 |
+| D5 | Dashboard never recovers from a failed first connection to Capella | dashboard | open | 2026-09-22, Phase 6 |
 
 ---
 
@@ -87,3 +88,27 @@ network, but the run does, and it also terminates a running app mid-demo.
 
 Fix later: skip `sync.start(...)` in `AppState.init` when `NSClassFromString("XCTestCase") != nil`, or give the tests
 their own host-less target now that nothing in them needs the app bundle except `@testable import`.
+
+## D5 — Dashboard never recovers from a failed first connection to Capella
+
+**What happened.** Starting Phase 6, the cluster was slow to answer (it had been idle) and the first
+`couchbase.connect` timed out. Every later request returned `502 {"error":"unambiguous timeout"}` **instantly**,
+including after the cluster was demonstrably healthy — a SQL++ probe from the same machine succeeded while the
+running server kept failing. Restarting the server fixed it.
+
+**Why.** `dashboard/lib/couchbase.js` memoises the connection:
+
+```js
+clusterPromise ??= couchbase.connect(...)
+```
+
+A rejected promise is still a promise, so the failure is cached for the life of the process and never retried.
+
+**Fix later.** Clear the cached promise when it rejects, so the next request reconnects:
+
+```js
+clusterPromise = couchbase.connect(...).catch((e) => { clusterPromise = undefined; throw e; });
+```
+
+Worth doing before a customer demo: the failure looks exactly like "Capella is down" when it is not, and the
+recovery (restart the server) is not obvious from the error. Noted in `docs/demo-guide.md` under recovery.

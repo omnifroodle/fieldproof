@@ -18,17 +18,21 @@ an entry without being asked.
 
 ## Current status
 
-Phase: **5 (demo polish + README) — complete 2026-09-22, waiting for Matt's go-ahead on Phase 6 (docs).**
+Phase: **6 (architecture and component docs) — complete 2026-09-22, plus a customer demo deck. Waiting for Matt.**
 Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
 
-- README.md covers prerequisites, Capella setup, secrets, run, the 5-minute demo script with timings, troubleshooting.
-- Demo script rehearsed 3× end to end from reset: seed 13–19 s to 30 pins, offline capture → LOOKS FAMILIAR (2 open,
-  98 %) every time, attach syncs in under a second, verify → tamper → MISMATCH, status change reaches the phone live.
-- Polish: header + sync banner + filters pinned (banner always visible), Find similar loading state, app icon, README banner.
-- Tests: `npm test` 4/4, Swift 10/10. Device build + install OK (not driven by hand this phase).
-- Known shortcuts logged in DEFECTS.md: D3 no swipe-back on detail, D4 unit tests launch the app and sync.
-- Swift ~2,790 lines, JS ~520. Cluster left empty after the last reset.
-- Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
+- `docs/architecture/` has the seven component documents from PLAN §13, each with a Mermaid diagram, "How FieldProof
+  uses it", talking points, enhancements, and alternatives. Plus `docs/demo-guide.md` and `docs/style-as-built.md`.
+- `docs/style-as-built.md` is the style **as built** with screenshots and a delta table against STYLE-GUIDE.md, not a
+  copy of it (PLAN §13.9 asked for `style-guide.md`; on a case-insensitive filesystem that name overwrites
+  STYLE-GUIDE.md, and a duplicate would go stale anyway).
+- Screenshots in `docs/images/screens/` (15 JPEGs, 3.4 MB total) and a 30-second clip in `docs/images/video/`,
+  captured from a live run on the simulator against Capella on 2026-09-22.
+- Customer deck (18 slides, screenshots + the clip) published as a private Artifact; the link is in the Phase 6 report.
+- New defect: D5, the dashboard caches a failed Capella connection and never retries (hit for real this phase).
+- Corrected in the docs: on-device analysis is 257–323 ms (measured, REFERENCE §7), not "about a second".
+- Tests: `npm test` 4/4, Swift 10/10. No source code changed this phase.
+- Cluster left empty after the last reset. Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
 
 ## Non-negotiable rules
 
