@@ -1,0 +1,12 @@
+<section id="tamper" style="background:#F3E9D2; color:#2B2B2B; font-family:'Source Serif 4', Georgia, serif; padding:128px; display:flex; flex-direction:column; gap:32px">
+  <p style="font-family:'Oswald', 'Trebuchet MS', sans-serif; font-size:26px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:#C4552D">The finale</p>
+  <h2 style="font-family:'Bebas Neue', Impact, sans-serif; font-size:88px; font-weight:400; line-height:1; letter-spacing:1px; color:#1F3D2B">AN INSIDER SWAPS THE PHOTOGRAPH</h2>
+  <div style="display:flex; gap:44px; flex:1; align-items:center">
+    <img src="../images/screens/verify-mismatch.jpg" alt="Evidence hash card showing a MISMATCH stamp" style="width:820px; height:600px; object-fit:contain">
+    <div style="flex:1; display:flex; flex-direction:column; gap:22px">
+      <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#E6D8B8; border:2px solid #2B2B2B; border-radius:10px; padding:28px"><h3 style="font-family:'Oswald', 'Trebuchet MS', sans-serif; font-size:30px; font-weight:600; color:#1F3D2B">What the script does</h3><p style="font-size:24px; line-height:1.4; color:#2B2B2B">1 — PUT new bytes over the photo attachment.</p><p style="font-size:24px; line-height:1.4; color:#2B2B2B">2 — PUT the document so its blob points at the new digest, so phones pull the swapped photo too.</p></div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:12px; background:#E6D8B8; border:2px solid #2B2B2B; border-radius:10px; padding:28px"><h3 style="font-family:'Oswald', 'Trebuchet MS', sans-serif; font-size:30px; font-weight:600; color:#1F3D2B">What the system says</h3><p style="font-size:24px; line-height:1.4; color:#2B2B2B">Verify: <b>MISMATCH</b>. 540,253 server bytes, a hash that is not the one the phone recorded at capture.</p><p style="font-size:24px; line-height:1.4; color:#2B2B2B">The tampered photo even reaches the crew&#39;s phone — and still fails verification there.</p></div>
+    </div>
+  </div>
+  <aside>Run it live: npm run tamper -- <report id>, then press Verify again. The tamper succeeded in changing the picture and failed to change the truth about it. Undo with npm run reset.</aside>
+</section>

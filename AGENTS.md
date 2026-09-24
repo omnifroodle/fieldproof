@@ -75,6 +75,9 @@ Update this line at the end of every phase. Keep a short "what works / what does
 
 `ios/` SwiftUI app · `dashboard/` Express + Leaflet · `scripts/` setup, reset, tamper ·
 `appservices/` sync functions and users · `selfhosted/` Docker fallback (only if needed) · `docs/` plan and architecture docs.
+`site/` GitHub Pages product page · `deck/` the customer deck (source of truth; `deck.json` + one HTML file per slide).
+`node scripts/build-site.mjs` assembles both, plus `docs/images/`, into `_site/`; `.github/workflows/pages.yml` publishes it
+on every push to `main`. Edit slides here, not in the old Claude Slides artifact.
 
 ## Style
 

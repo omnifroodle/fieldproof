@@ -1,0 +1,73 @@
+{
+  "v": 4,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-09-22T21:10:00Z"
+  },
+  "title": "FieldProof \u2014 Offline-First Field Reporting",
+  "order": [
+    "cover",
+    "problem",
+    "five-beats",
+    "offline",
+    "on-device-ai",
+    "edge-economics",
+    "duplicate",
+    "the-query",
+    "the-index",
+    "watch",
+    "evidence",
+    "tamper",
+    "sync",
+    "dashboard",
+    "architecture",
+    "split",
+    "roadmap",
+    "close"
+  ],
+  "sections": {
+    "opening": {
+      "description": "What FieldProof is and the three field problems it answers",
+      "start": "cover"
+    },
+    "on-the-phone": {
+      "description": "Beats 1 and 2: the database and the AI both run on the device",
+      "start": "offline"
+    },
+    "duplicate-check": {
+      "description": "Beat 3: vector search in Couchbase Lite, the query and the measured threshold",
+      "start": "duplicate"
+    },
+    "trust": {
+      "description": "Beat 4: hashing at capture, verification, and a live tamper",
+      "start": "evidence"
+    },
+    "cloud": {
+      "description": "Beat 5: channels, sync, and the supervisor dashboard on Capella",
+      "start": "sync"
+    },
+    "closing": {
+      "description": "Where the work runs, what we would add, and what to take away",
+      "start": "split"
+    }
+  },
+  "faces": {
+    "bebas-neue": {
+      "family": "Bebas Neue",
+      "href": "https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
+    },
+    "oswald": {
+      "family": "Oswald",
+      "href": "https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap"
+    },
+    "source-serif-4": {
+      "family": "Source Serif 4",
+      "href": "https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&display=swap"
+    },
+    "jetbrains-mono": {
+      "family": "JetBrains Mono",
+      "href": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+    }
+  },
+  "designSystems": []
+}

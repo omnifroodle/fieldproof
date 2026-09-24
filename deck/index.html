@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FieldProof Deck</title>
+<meta name="description" content="The FieldProof customer deck: offline-first field reporting with on-device AI and Couchbase.">
+<style>
+  /* A plain viewer for the slide files in slides/. Each slide is a 1920×1080 <section> with inline styles. */
+  :root { color-scheme: light; --paper: #F3E9D2; --pine: #1F3D2B; --mustard: #D9A441; --chalk: #FBF7EE; --charcoal: #2B2B2B; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--charcoal); overflow: hidden; }
+  #stage { position: absolute; left: 50%; top: 50%; width: 1920px; height: 1080px; transform-origin: 0 0; }
+  #stage section { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; }
+  /* Slides carry their own inline display, so hiding needs !important; print shows them all. */
+  @media screen { #stage section:not(.on) { display: none !important; } }
+  section h1, section h2, section h3, section p, section ul, section table { margin: 0; }
+  section ul { padding-left: 1.1em; }
+  section hr { margin: 0; border: 0; }
+  section table { border-collapse: separate; border-spacing: 0; width: 100%; }
+  section th, section td { text-align: left; padding: 12px 18px; vertical-align: top; }
+  section th { font-family: 'Oswald', sans-serif; font-weight: 600; border-bottom: 2px solid currentColor; }
+  section tr + tr td { border-top: 1px solid rgba(127,127,127,.35); }
+  section aside { display: none; }
+  section p { font-variant-ligatures: none; }
+  x-shape { display: block; }
+  x-shape[kind="arrow-right"] { clip-path: polygon(0 30%, 62% 30%, 62% 0, 100% 50%, 62% 100%, 62% 70%, 0 70%); }
+  #bar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 16px; align-items: center; padding: 8px 16px;
+         font: 600 13px/1.2 'Oswald', sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--chalk);
+         background: rgba(43,43,43,.85); opacity: 0; transition: opacity .3s; }
+  body:hover #bar, #bar:focus-within { opacity: 1; }
+  #bar a { color: var(--mustard); }
+  #bar span { flex: 1; }
+  #notes { position: fixed; left: 0; right: 0; bottom: 36px; max-height: 40vh; overflow: auto; margin: 0; padding: 16px 20px;
+           font: 18px/1.4 'Source Serif 4', Georgia, serif; color: var(--charcoal); background: var(--paper); border-top: 3px solid var(--mustard); }
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { height: auto; overflow: visible; background: none; }
+    #stage { position: static; transform: none !important; width: auto; height: auto; }
+    #stage section { position: relative; page-break-after: always; }
+    #bar, #notes { display: none; }
+  }
+</style>
+</head>
+<body>
+<div id="stage" aria-live="polite"></div>
+<pre id="notes" hidden></pre>
+<nav id="bar">
+  <a href="../">FieldProof</a><span id="count"></span>
+  ← → or space to move · N notes · F full screen · print for PDF
+</nav>
+<script type="module">
+  // Loads deck.json, then each slide file in order. The deck is data in git; this page only shows it.
+  const stage = document.getElementById('stage');
+  const notes = document.getElementById('notes');
+  const deck = await (await fetch('deck.json')).json();
+  for (const face of Object.values(deck.faces ?? {})) {
+    if (face.href) document.head.insertAdjacentHTML('beforeend', `<link rel="stylesheet" href="${face.href}">`);
+  }
+  const html = await Promise.all(deck.order.map(id => fetch(`slides/${id}.html`).then(r => r.text())));
+  stage.innerHTML = html.join('\n');
+  const slides = [...stage.querySelectorAll(':scope > section')];
+
+  // A screenshot marked with data-video plays that clip in its place.
+  for (const img of stage.querySelectorAll('img[data-video]')) {
+    const v = Object.assign(document.createElement('video'),
+      { src: img.dataset.video, poster: img.src, muted: true, loop: true, autoplay: true, playsInline: true });
+    v.setAttribute('style', img.getAttribute('style'));
+    v.setAttribute('aria-label', img.alt);
+    img.replaceWith(v);
+  }
+
+  let i = Math.max(0, deck.order.indexOf(location.hash.slice(1)));
+  function show(n) {
+    i = Math.min(slides.length - 1, Math.max(0, n));
+    slides.forEach((s, k) => s.classList.toggle('on', k === i));
+    notes.textContent = slides[i].querySelector('aside')?.textContent.trim() ?? '';
+    document.getElementById('count').textContent = `${i + 1} / ${slides.length}`;
+    history.replaceState(null, '', `#${slides[i].id}`);
+  }
+  function fit() {
+    const k = Math.min(innerWidth / 1920, innerHeight / 1080);
+    stage.style.transform = `scale(${k}) translate(-50%, -50%)`;
+  }
+  addEventListener('resize', fit);
+  addEventListener('hashchange', () => show(deck.order.indexOf(location.hash.slice(1))));
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' '].includes(e.key)) show(i + 1);
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) show(i - 1);
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key.toLowerCase() === 'n') notes.hidden = !notes.hidden;
+    else if (e.key.toLowerCase() === 'f') document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    else return;
+    e.preventDefault();
+  });
+  stage.addEventListener('click', e => { if (!e.target.closest('a')) show(i + (e.clientX > innerWidth / 2 ? 1 : -1)); });
+  fit(); show(i);
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FieldProof</title>
+<meta name="description" content="Offline-first field reporting with the database, the vector search and the AI on the phone. Built on Couchbase Lite, App Services and Capella. Open source demo.">
+<meta property="og:title" content="FieldProof — works where the signal doesn't">
+<meta property="og:description" content="A database, a vector index and five AI models, on the phone. Syncs to Capella when the signal comes back.">
+<meta property="og:image" content="images/banner.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="#top">FieldProof</a>
+  <div class="links">
+    <a href="#features">Features</a>
+    <a href="#why-now">Why now</a>
+    <a href="#specs">Specs</a>
+    <a class="buy" href="#get-it">Get it</a>
+  </div>
+</nav>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero" id="top">
+  <svg class="range" viewBox="0 0 1200 300" preserveAspectRatio="none" aria-hidden="true">
+    <circle cx="930" cy="120" r="78" fill="#D9A441"/>
+    <polygon points="0,300 0,186 216,90 408,156 660,66 936,144 1200,102 1200,300" fill="#3E6B4E"/>
+    <polygon points="0,300 0,234 264,150 504,210 792,132 1032,198 1200,168 1200,300" fill="#1F3D2B"/>
+    <polygon points="0,300 0,276 360,228 720,264 984,222 1200,252 1200,300" fill="#2B2B2B"/>
+  </svg>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">Couchbase Lite · Vector Search · App Services · Capella</p>
+      <h1>FIELDPROOF</h1>
+      <p class="tagline">Works where the signal doesn’t.</p>
+      <p class="lede">A database, a vector index and five AI models, on the phone. The report is captured, checked for duplicates, and hashed with the radio off, then synced to Capella when the signal comes back.</p>
+      <div class="ctas">
+        <a class="btn primary" href="deck/">Watch the deck</a>
+        <a class="btn outline" href="https://github.com/omnifroodle/fieldproof">Get the code</a>
+      </div>
+    </div>
+    <figure class="phone hero-phone">
+      <img src="images/screens/duplicate-check.jpg" width="800" height="1739" alt="FieldProof's duplicate check: two open reports within 200 metres look like this one, 98% alike.">
+    </figure>
+  </div>
+</header>
+
+<section class="statement">
+  <p>The phone is not a thin client.</p>
+  <p class="quiet">It holds a database, an index and the models. It answers a similarity question in a canyon.</p>
+</section>
+
+<!-- ============================ FEATURES ============================ -->
+<div id="features">
+
+<section class="feature">
+  <div class="copy">
+    <p class="kicker">Offline first</p>
+    <h2>The database is on the phone.</h2>
+    <p>Airplane mode, and the app is not degraded. It is home. The list, the photographs, the filters and the search all come out of Couchbase Lite: collections, indexes, SQL++ and transactions, on the device.</p>
+    <p>Every capture is one batch. The report, the photo and the parent update land together or not at all, even on a dying battery.</p>
+    <ul class="facts">
+      <li><b>Same names both sides.</b> <code>evidence.reports</code> on the phone is <code>evidence.reports</code> in Capella. Nothing is translated.</li>
+      <li><b>No outbox code.</b> The pending count comes from the database itself.</li>
+    </ul>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/couchbase-lite.md">How Couchbase Lite is used →</a>
+  </div>
+  <figure class="phone">
+    <img src="images/screens/list-offline.jpg" width="800" height="1739" loading="lazy" alt="The report list with an amber banner: offline, reports safe on device.">
+  </figure>
+</section>
+
+<hr class="sunburst">
+
+<section class="feature flip">
+  <div class="copy">
+    <p class="kicker">On-device AI</p>
+    <h2>Three models. A third of a second. No network.</h2>
+    <p>The moment a photograph is taken, Apple’s Vision framework classifies it, reads any text in it, and writes a 768-number fingerprint of what it shows. No API key, no invoice, no upload.</p>
+    <div class="bignum"><span>257–323</span> ms for all three, on the phone.<sup><a href="#fn1">1</a></sup></div>
+    <p>Two more run when the crew asks. Dictate the note with gloves on: speech recognition stays on the device. And the report writes its own one-line summary with Apple’s on-device language model.<sup><a href="#fn2">2</a></sup></p>
+    <p class="aside">AI is supporting evidence, never a gate. If a model is missing or refuses, the report is still filed, hashed and synced.</p>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/on-device-ai.md">How the on-device AI works →</a>
+  </div>
+  <figure class="phone">
+    <img src="images/screens/review-evidence.jpg" width="800" height="1739" loading="lazy" alt="The review screen: labels, recognised text, GPS, heading, time and the SHA-256 of the photo.">
+  </figure>
+</section>
+
+<section class="feature hero-feature">
+  <div class="copy">
+    <p class="kicker">Vector search, on the device</p>
+    <h2>Looks familiar.</h2>
+    <p>Before the report is filed, the app has already searched every report on the phone for a photograph like this one, within 200 metres, still open. Four crews, one pothole, one work order.</p>
+    <div class="bignum"><span>98%</span> alike, 29 m away, found with no signal.<sup><a href="#fn3">3</a></sup></div>
+    <p>The duplicate check is a query, not a service. One statement mixes a vector distance with a status filter and a map box. There is no second system to run, and nothing to pay per query.</p>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/vector-search-on-device.md">How vector search runs on the phone →</a>
+  </div>
+  <pre class="code" aria-label="The duplicate-check query, SQL++ on Couchbase Lite"><code><span class="k">SELECT</span> META().id, category, status,
+       <span class="h">APPROX_VECTOR_DISTANCE</span>(embedding,
+         $queryVector, 'COSINE') <span class="k">AS</span> distance
+<span class="k">FROM</span> evidence.reports
+<span class="k">WHERE</span> status != 'resolved'
+  <span class="k">AND</span> location.lat <span class="k">BETWEEN</span> $minLat <span class="k">AND</span> $maxLat
+  <span class="k">AND</span> location.lon <span class="k">BETWEEN</span> $minLon <span class="k">AND</span> $maxLon
+  <span class="k">AND</span> <span class="h">APPROX_VECTOR_DISTANCE</span>(embedding,
+        $queryVector, 'COSINE') &lt; $maxDistance
+<span class="k">ORDER BY</span> <span class="h">APPROX_VECTOR_DISTANCE</span>(embedding,
+         $queryVector, 'COSINE')
+<span class="k">LIMIT</span> $maxResults</code></pre>
+</section>
+
+<hr class="sunburst">
+
+<section class="feature">
+  <div class="copy">
+    <p class="kicker">Evidence integrity</p>
+    <h2>Hashed at capture. Checked on demand.</h2>
+    <p>SHA-256 runs on the phone over exactly the bytes that will be stored, before anything syncs. Verify does not look up a stored answer. It re-hashes what the server holds right now.</p>
+    <p>Swap the photo with valid credentials, and Verify catches it in one click. The tampered photo even reaches the crew’s phone, and it fails there too.</p>
+    <p class="aside">What it does not prove: that the camera saw what the metadata claims. That takes a Secure Enclave signature, a small addition.</p>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/evidence-integrity.md">How evidence integrity works →</a>
+  </div>
+  <div class="stamps">
+    <img src="images/screens/verify-verified.jpg" width="900" height="629" loading="lazy" alt="Evidence card stamped VERIFIED: the server's bytes hash to the value recorded at capture.">
+    <img src="images/screens/verify-mismatch.jpg" width="900" height="761" loading="lazy" alt="Evidence card stamped MISMATCH after the photo was swapped on the server.">
+  </div>
+</section>
+
+<hr class="sunburst">
+
+<section class="feature flip">
+  <div class="copy">
+    <p class="kicker">Sync with Capella App Services</p>
+    <h2>Eleven lines decide who sees what.</h2>
+    <p>A sync function validates each document, checks the writer’s access, and routes it to a district channel. The access model lives with the data, not in the app.</p>
+    <div class="bignum"><span>25</span> reports on this phone. 30 in the cluster.</div>
+    <p>The other district is not filtered in the UI. It never arrives. Lose access to a channel and those documents leave the device on their own. No admin credential anywhere.</p>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/sync-and-app-services.md">How sync and channels work →</a>
+  </div>
+  <figure class="phone">
+    <img src="images/screens/settings-user-and-sync.jpg" width="800" height="1739" loading="lazy" alt="Settings: the signed-in crew member, their district, and sync status.">
+  </figure>
+</section>
+
+<section class="feature wide">
+  <div class="copy">
+    <p class="kicker">Capella and the supervisor dashboard</p>
+    <h2>Once it syncs, it is just data.</h2>
+    <p>Data a phone wrote in a canyon is ordinary Capella data the moment it lands: SQL++, indexes and joins. One query draws the map. A change feed puts a new report on the supervisor’s screen with no polling.</p>
+    <div class="bignum"><span>~3 s</span> from filing on the phone to a new pin on the map.<sup><a href="#fn4">4</a></sup></div>
+    <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/dashboard-and-capella.md">How the dashboard reads Capella →</a>
+  </div>
+  <figure class="frame">
+    <img src="images/screens/dashboard-map.jpg" width="1400" height="1707" loading="lazy" alt="The supervisor dashboard: a map of reports with status pins and a list beside it.">
+  </figure>
+</section>
+
+</div>
+
+<!-- ============================== VIDEO ============================= -->
+<section class="watch">
+  <div class="copy">
+    <p class="kicker">Thirty seconds, start to finish</p>
+    <h2>Watch it happen.</h2>
+    <p>Offline. Pick the photograph. Three models read the scene. The review shows GPS, heading, time and the SHA-256. The duplicate check finds two open reports nearby. Attach, and the pending count goes to two.<sup><a href="#fn5">5</a></sup></p>
+  </div>
+  <figure class="phone">
+    <video src="images/video/capture-flow.mp4" poster="images/video/capture-flow-poster.jpg" muted loop playsinline autoplay controls
+           aria-label="Offline capture through to the duplicate check"></video>
+  </figure>
+</section>
+
+<!-- ============================= WHY NOW ============================ -->
+<section class="why" id="why-now">
+  <p class="kicker">Why this approach, and why now</p>
+  <h2>The compute moved into the pocket. The database followed.</h2>
+  <div class="reasons">
+    <article>
+      <h3>The models ship with the phone</h3>
+      <p>Vision, on-device speech and an on-device language model are part of the operating system now. The crew already carries the hardware that runs them, and replaces it on a cycle.</p>
+    </article>
+    <article>
+      <h3>Vector search moved to the edge</h3>
+      <p>Couchbase Lite puts a vector index beside the documents, in the same embedded database. The second AI workload, “have we seen this before,” is a local index lookup, not a call to a vector service.</p>
+    </article>
+    <article>
+      <h3>The bill inverts at the edge</h3>
+      <p>Every phone you add brings its own inference capacity. Two hundred crew, forty photographs a day: 8,000 inferences a day that never reach an invoice.<sup><a href="#fn6">6</a></sup></p>
+    </article>
+    <article>
+      <h3>The field never got better signal</h3>
+      <p>Canyons, basements, tunnels and rural spans are still dark. The moment capture depends on a round trip, the app stops working where the work is.</p>
+    </article>
+  </div>
+
+  <table class="compare">
+    <caption>Where the AI runs changes everything else</caption>
+    <thead><tr><th></th><th>On the device</th><th>In the cloud</th></tr></thead>
+    <tbody>
+      <tr><th>Marginal cost per photo</th><td>Zero</td><td>Per-call inference, plus egress</td></tr>
+      <tr><th>Latency</th><td>257–323 ms, predictable</td><td>Round trip, queueing, rate limits</td></tr>
+      <tr><th>Works with no signal</th><td>Yes</td><td>No. Capture cannot complete</td></tr>
+      <tr><th>Data leaving the device</th><td>The photo, later, over sync</td><td>Every photo, immediately, to a third party</td></tr>
+      <tr><th>Cost as the fleet grows</th><td>Flat</td><td>Linear in photographs</td></tr>
+      <tr><th>When a model fails</th><td>Weaker metadata. Evidence still captured</td><td>Capture blocked or queued</td></tr>
+    </tbody>
+  </table>
+
+  <div class="split">
+    <div><h3>On the phone</h3><p>Classification, text, embeddings, dictation, summaries. The duplicate search. Evidence hashing. Every read and write the app makes.</p></div>
+    <div><h3>In Capella</h3><p>The system of record. Access control, in the sync function. The questions that span every district at once.</p></div>
+  </div>
+  <p class="closer">Inference at the edge, aggregation in the cloud. That split is the architecture, not an optimisation.</p>
+</section>
+
+<!-- ============================== SPECS ============================= -->
+<section class="specs" id="specs">
+  <p class="kicker">Tech specs</p>
+  <h2>What’s inside.</h2>
+  <dl>
+    <div><dt>Embedded database</dt><dd>Couchbase Lite Swift Enterprise 4.1.2, with the Vector Search extension. Scope <code>evidence</code>, collections <code>reports</code> and <code>photos</code>.</dd></div>
+    <div><dt>Vector index</dt><dd>768 dimensions, 8 centroids, cosine. Duplicate threshold 0.15, measured on real photographs.<sup><a href="#fn7">7</a></sup></dd></div>
+    <div><dt>Duplicate radius</dt><dd>200 m bounding box, open reports only, served by an ordinary value index before the vector ranks.</dd></div>
+    <div><dt>Image models</dt><dd>Vision: classification, text recognition, feature print revision 2 (pinned so vectors stay comparable).</dd></div>
+    <div><dt>Language and speech</dt><dd>On-device speech recognition for notes. Apple Foundation Models for the summary: 4.455 s on iPhone 15 Pro Max.<sup><a href="#fn2">2</a></sup></dd></div>
+    <div><dt>Integrity</dt><dd>SHA-256 over the stored bytes, at capture. Re-verified on the phone and on the dashboard.</dd></div>
+    <div><dt>Sync</dt><dd>Capella App Services 4.1.2 over a WebSocket. One replicator, both collections, channels per district.</dd></div>
+    <div><dt>Cloud</dt><dd>Capella cluster, SQL++ via the Node SDK. Live updates from the App Services changes feed.</dd></div>
+    <div><dt>Requirements</dt><dd>iOS 17 or later. The summary needs iOS 26 on a device with Apple Intelligence (iPhone 15 Pro or newer).</dd></div>
+    <div><dt>Size</dt><dd>About 3,000 lines of Swift and 530 of JavaScript. Two Swift packages, no JavaScript build step.</dd></div>
+  </dl>
+</section>
+
+<!-- ============================== GET IT ============================ -->
+<section class="get" id="get-it">
+  <h2>Get FieldProof.</h2>
+  <p class="price">Free. Open source. MIT licensed.</p>
+  <p>The app, the dashboard, the sync functions, the setup and reset scripts, and an architecture note for every component. Fork it, point it at your own Capella, and run the five minutes on your own photographs.</p>
+  <div class="ctas">
+    <a class="btn primary" href="https://github.com/omnifroodle/fieldproof">Get the code</a>
+    <a class="btn outline" href="deck/">Watch the deck</a>
+    <a class="btn outline" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/demo-guide.md">Run the demo</a>
+  </div>
+  <ul class="doclinks">
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/overview.md">Architecture overview</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/couchbase-lite.md">Couchbase Lite</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/on-device-ai.md">On-device AI</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/vector-search-on-device.md">Vector search</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/evidence-integrity.md">Evidence integrity</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/sync-and-app-services.md">Sync and App Services</a></li>
+    <li><a href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/dashboard-and-capella.md">Dashboard and Capella</a></li>
+  </ul>
+</section>
+
+<!-- ============================ FINE PRINT ========================== -->
+<footer class="fineprint">
+  <ol>
+    <li id="fn1">Classification, text recognition and feature print together, measured on an iPhone 15 Pro Max. Apple’s general classifier has no pavement vocabulary, so labels on close-up asphalt are weak. That is where your own Core ML model goes. The fingerprint, which the duplicate check uses, is unaffected.</li>
+    <li id="fn2">One-line summary measured at 4.455 s on an iPhone 15 Pro Max (<code>ReportSummaryTests</code>, run on the device). It runs in the background while the crew member reviews. Dictation and the summary need a real device; the simulator lacks both models’ assets.</li>
+    <li id="fn3">From the demo data set: two open reports, 29 m and 57 m away. Similarity is shown as 1 minus cosine distance.</li>
+    <li id="fn4">Measured from filing a report on the phone to the open dashboard redrawing, with Capella App Services and the dashboard’s changes-feed longpoll.</li>
+    <li id="fn5">Recorded on the iOS Simulator and sped up 3×. On the simulator, Vision’s image models do not run, so the demo’s sample photos carry results precomputed on a Mac with the same model. On a device, every model runs live.</li>
+    <li id="fn6">Illustrative arithmetic: 200 × 40 = 8,000 photographs, one on-device inference pass each. Not a customer measurement.</li>
+    <li id="fn7">Same pothole with a crop or hue shift: 0.019–0.020. With a 3° rotation: 0.092–0.102. Two different potholes: 0.18–0.31. The threshold is a number you measure on your own photographs.</li>
+  </ol>
+  <p>FieldProof is a demo built to show Couchbase Lite, Couchbase Lite Vector Search, Capella App Services and Capella working together. Couchbase, Capella and Couchbase Lite are trademarks of Couchbase, Inc. iPhone and Apple Intelligence are trademarks of Apple Inc. Sample photos are public domain or CC0.</p>
+</footer>
+
+<script>
+  // Respect reduced motion: the capture clip waits for a press instead of playing on its own.
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    for (const v of document.querySelectorAll('video[autoplay]')) { v.removeAttribute('autoplay'); v.pause(); }
+  }
+</script>
+</body>
+</html>

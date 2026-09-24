@@ -14,3 +14,6 @@ build/
 
 # macOS
 .DS_Store
+
+# GitHub Pages build output (node scripts/build-site.mjs)
+_site/

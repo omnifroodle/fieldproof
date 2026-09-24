@@ -27,6 +27,9 @@ feed instead of polling. The first two need a real device (`docs/REFERENCE.md` Â
 | Backend | Capella cluster, bucket `demos`, scope `evidence`, collections `reports` and `photos` |
 | Dashboard | Node + Express + Leaflet, no build step |
 
+**See it:** the [product page](https://omnifroodle.github.io/fieldproof/) and the
+[customer deck](https://omnifroodle.github.io/fieldproof/deck/) (18 slides; press N for speaker notes).
+
 ---
 
 ## 1. Prerequisites
