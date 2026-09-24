@@ -1,0 +1,85 @@
+# FieldProof — working agreement for coding agents
+
+FieldProof is a Couchbase demo: an offline-first field logging and reporting app (iOS, SwiftUI,
+Couchbase Lite EE with on-device vector search) that syncs through Capella App Services to a Capella
+cluster, plus a small Node.js supervisor dashboard. It exists to tell a clear 5-minute story to a
+customer, with code a Couchbase engineer can walk through on screen.
+
+Read these before doing anything, in this order:
+
+1. `docs/PLAN.md` — the plan. Phases, decisions, data model, the showcase query, acceptance criteria.
+2. `docs/REFERENCE.md` — the only approved API surface, with versions and sources.
+3. `docs/STYLE-GUIDE.md` — the park-poster visual system.
+
+`docs/fieldproof-claude-code-prompt.md` is the original brief. Do not edit it.
+
+`docs/DEFECTS.md` is Matt's cleanup log. Add to it when Matt asks, or when you knowingly accept a shortcut; never fix
+an entry without being asked.
+
+## Current status
+
+Phase: **7 (optional stretch) — complete 2026-09-22. All planned phases are done; waiting for Matt.**
+Update this line at the end of every phase. Keep a short "what works / what does not" list under it.
+
+- Phase 7 added three things: a dictated note (`AI/VoiceNotes.swift`, SFSpeechRecognizer with
+  `requiresOnDeviceRecognition`), a one-line summary from Apple's on-device language model
+  (`AI/ReportSummary.swift`, saved as the report's `summary` field), and dashboard live updates from the
+  App Services `_changes` longpoll (SSE on `/api/stream`) instead of a 3-second poll.
+- **Device only:** the simulator cannot initialize the speech recognizer, and Foundation Models reports itself
+  available there and then fails (missing assets). Both are handled with a message on screen. REFERENCE §7.5.
+- Verified: Foundation Models on the paired iPhone 15 Pro Max — `ReportSummaryTests` passed in 4.455 s
+  (11/11 on device). Live update measured at about 3 s from filing to the open dashboard redrawing.
+  Dictation's transcription itself still needs a person to speak into a device.
+- Tests: Swift 11/11 on device, 10 + 1 skipped on the simulator; `npm test` 4/4. Device build installs.
+- Size: app Swift is **exactly 3,000 lines** (plus 133 of tests), at the budget; JS 527 of 800.
+- New defect D6 (one held longpoll per open dashboard, deferred by choice).
+- Customer deck (18 slides) updated for the new features; link in the Phase 7 report.
+- Cluster left empty after the last reset. Node here is Homebrew 26.5 at `/opt/homebrew/bin`; prefix `PATH=/opt/homebrew/bin:$PATH` in bash.
+
+## Non-negotiable rules
+
+- **Phase gates.** Finish a phase, build and run it, write the phase report (PLAN.md §12), then stop
+  and wait for Matt. Never start the next phase on your own.
+- **No invented APIs.** If a Couchbase or Apple API is not in `docs/REFERENCE.md`, look it up in the
+  official docs linked there, add it with a source and date, then use it. Blog posts and memory do not count.
+  When the `couchbaselabs/agent-skills` plugin disagrees with REFERENCE.md, REFERENCE.md wins.
+- **Secrets never touch git.** `ios/FieldProof/Config/Secrets.plist` and `dashboard/.env` are ignored;
+  only the `.example` files are committed. If you need a credential, finish everything else, then ask.
+- **Persona is generic.** Field crew, crew member, technician, inspector, supervisor. No job titles
+  ("ranger", "officer") in UI text, identifiers, comments, or docs. The park theme is visual only.
+- **Small and readable.** Under ~3,000 lines of Swift, under ~800 of JavaScript, no JS build step,
+  no Swift dependencies beyond `CouchbaseLiteSwift` and `CouchbaseLiteVectorSearch`.
+- **Talking-point comments.** Every use of a Couchbase feature gets a 1–3 line comment a presenter can
+  read aloud. `DuplicateCheckQuery.swift` is shown on screen; keep it under 120 lines with a comment per clause.
+- **Scope is the plan.** No extra features. If something seems missing, say so in the phase report.
+  If something is blocked, finish everything else and state exactly what was left out.
+
+## Verification before claiming done
+
+- iOS: build for the simulator and run it; drive the flow with the simulator tool and take a screenshot
+  of the result. If a device is connected, also build for the device.
+- Dashboard: `npm test` and a real request against the running server.
+- Phase reports say what was actually run and what was observed, not what should happen.
+- Failures are reported with output. "Done" means built, run, and observed.
+
+## Environment
+
+- macOS, fish shell (`/opt/homebrew/bin/fish`); write commands that work in fish or run them via `bash -c`.
+- Xcode: latest stable installed. iOS 17+ simulators. Node 20/22 LTS.
+- The simulator has no camera and no airplane mode; use demo mode and the in-app "Simulate offline" switch.
+- Capella free tier pauses after 72 idle hours; resume the cluster and App Endpoint before testing sync.
+- Git remote: `origin` → https://github.com/omnifroodle/fieldproof (public, MIT). Commit at the end of each
+  phase with a message that names the phase, then push. Everything pushed is public; secrets stay ignored.
+
+## Layout (see PLAN.md §3)
+
+`ios/` SwiftUI app · `dashboard/` Express + Leaflet · `scripts/` setup, reset, tamper ·
+`appservices/` sync functions and users · `selfhosted/` Docker fallback (only if needed) · `docs/` plan and architecture docs.
+
+## Style
+
+- Swift: one type per file, files named after the type, `// MARK:` sections, no force unwraps outside
+  app startup, async/await over callbacks.
+- JavaScript: ESM, `node:` imports, `fetch` for REST, no TypeScript, no framework beyond Express.
+- Docs: Markdown with Mermaid diagrams. Short sentences. Each architecture doc has "How FieldProof uses it",
+  "Talking points", "Possible enhancements", and "Alternatives and trade-offs".

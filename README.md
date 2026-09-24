@@ -189,5 +189,6 @@ docs/                  PLAN.md, REFERENCE.md (verified APIs + findings), STYLE-G
 
 ---
 
+Code is MIT licensed; see [LICENSE](LICENSE).
 Sample photos are public domain or CC0 with attribution in `ios/FieldProof/Demo/Samples/ATTRIBUTION.md`.
 Bundled fonts are SIL Open Font License; see `ios/FieldProof/Design/Fonts/FONTS.md`.
