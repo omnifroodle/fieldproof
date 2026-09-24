@@ -691,3 +691,39 @@ export async function verifyReport(id) {
 5. **Duplicate threshold 0.15** (not 0.35), measured in Phase 2; see REFERENCE.md §7.2.
 6. **Simulator AI in practice:** `ImageAnalyzer` uses `Demo/Samples/analysis.json` (keyed by SHA-256) for labels and embeddings on the
    simulator only, and runs OCR live. The review screen says so. Rerun `swift scripts/embed-samples.swift` after changing samples.
+
+## 17. Roadmap (not scheduled; Matt decides when)
+
+### 17.1 Review the Capella AI Data Plane (paid tier)
+
+FieldProof deliberately runs on the Capella free tier with a plain phone app. The paid **Capella AI Data Plane**
+(REFERENCE.md §4) could make parts of it simpler or stronger. The docs and the product page already carry short
+asides marked "Capella AI Data Plane (paid)"; this item is the review that turns them into tested claims.
+
+What to evaluate, in order of likely payoff:
+
+1. **AI Functions in SQL++** on the dashboard: `ai_summary` for a weekly digest per district, `ai_classification` to
+   triage notes, `ai_masked` to strip names and phone numbers from notes before a report is shared outside the
+   organisation, and `ai_summary` / `ai_completion` as a server-side fallback summary for phones without Apple
+   Intelligence.
+2. **The Couchbase MCP Server** in read-only mode, so a supervisor can ask an assistant questions about the reports
+   ("open potholes in Valley older than a week") in plain language.
+3. **Data Processing Service** workflows to vectorize photographs that arrive from other channels (email, a web
+   portal, a contractor's S3 upload).
+4. **Model Service** for a hosted embedding model or LLM that stays inside Capella.
+
+Questions the review must answer:
+
+- **Vector compatibility.** The phone's vectors come from Vision feature print revision 2. A server-side model
+  produces different vectors that cannot be compared with them. Either one model runs on both sides, or the
+  server keeps its own index and the duplicate check stays per-model. The docs list text embedding models only;
+  confirm whether any hosted model embeds images.
+- **Where the AI runs, and what it costs.** On-device inference is free per call and works offline. Every AI
+  Data Plane call is a server-side charge and needs connectivity. Keep capture on the phone; use the AI Data Plane
+  only for work that is genuinely global.
+- **Requirements.** AI Functions need a paid cluster on Couchbase Server 8.0+, Developer Pro or Enterprise support,
+  and multiple availability zones. Price the smallest cluster that meets them.
+- **Demo shape.** Whether this becomes an optional sixth beat on a paid cluster, with the free-tier demo unchanged.
+
+Deliverable: a `docs/architecture/capella-ai-data-plane.md` note in the usual four sections, measured results for
+whatever is tried, and updated asides.

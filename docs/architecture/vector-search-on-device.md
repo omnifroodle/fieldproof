@@ -93,9 +93,15 @@ embedded live on an iPhone 15 Pro Max was 2.1e-4.
 
 ## Possible enhancements
 
+> **Capella AI Data Plane (paid).** Its Data Processing Service runs workflows that vectorize PDFs and images
+> from S3, or JSON already in Capella, with an embedding model from the Model Service, OpenAI, or Amazon Bedrock.
+> That covers photographs that never passed through a phone. One catch decides the design: vectors from a
+> different model cannot be compared with Vision feature prints. Either one model runs on both sides, or the
+> server keeps its own index. The on-device check stays as it is either way: it is what works with no signal. Not part of this demo, which runs on the Capella free tier; see the review item in `docs/PLAN.md` §17.1 and `docs/REFERENCE.md` §4.
+
 - **Server-side vector search** with the Capella Search service for cross-district deduplication, where the
   question is bigger than one phone's data.
-- **Capella AI Services** to vectorize images that arrive from other channels (email, a web portal, a contractor's
+- **Capella AI Data Plane** workflows to vectorize images that arrive from other channels (email, a web portal, a contractor's
   upload) with the same model family, so the corpora are comparable.
 - **Text embeddings for notes**, combined with full-text search, to catch "same pothole, described twice" when the
   photographs are taken from opposite sides.

@@ -105,6 +105,10 @@ The parent's `relatedReportIds` gets the new id in the same batch.
 
 ## Possible enhancements
 
+> **Capella AI Data Plane (paid).** FieldProof puts inference at the edge and aggregation in the cloud (`on-device-ai.md`). That leaves
+> room on the cloud side. The paid AI Data Plane adds AI Functions in SQL++ (summaries, classification, PII
+> masking), hosted models, vectorization workflows, and an MCP server. The component notes say where each fits. Not part of this demo, which runs on the Capella free tier; see the review item in `docs/PLAN.md` §17.1 and `docs/REFERENCE.md` §4.
+
 - Delta sync for the report documents, and a push filter that holds full-resolution photos until Wi-Fi.
 - Peer-to-peer replication between crew phones (Couchbase Lite 4.1 multipeer) so a convoy shares findings with
   no infrastructure at all.

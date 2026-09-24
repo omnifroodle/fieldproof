@@ -118,6 +118,12 @@ supporting evidence here, never a gate.
 
 ## Possible enhancements
 
+> **Capella AI Data Plane (paid).** The phone's one-line summary needs Apple Intelligence: iOS 26 on an
+> iPhone 15 Pro or newer. A report from an older phone syncs without one today. With the AI Data Plane, a SQL++
+> `ai_summary` or `ai_completion` call on the server could write it from the same facts after sync. The trade is
+> the one in the table above: a per-call charge, a round trip, and the data leaving the device. Capture never waits
+> for it. Not part of this demo, which runs on the Capella free tier; see the review item in `docs/PLAN.md` §17.1 and `docs/REFERENCE.md` §4.
+
 - **A custom classifier trained with Create ML** on the customer's own categories (pothole, spalling, corrosion,
   graffiti, vegetation) and dropped in as a Core ML model. This is the direct answer to the weak generic labels,
   and it is a day of work if the customer has labelled photographs.

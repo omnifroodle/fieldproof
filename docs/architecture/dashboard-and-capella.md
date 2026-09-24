@@ -77,11 +77,18 @@ its ids from SQL++ instead, and skips the internal documents App Services keeps 
 
 ## Possible enhancements
 
+> **Capella AI Data Plane (paid).** The dashboard already speaks SQL++, and the AI Data Plane adds AI Functions to
+> SQL++: `ai_summary` over a week of notes for a per-district digest, `ai_classification` to triage free-text notes,
+> and `ai_masked` to hide names and phone numbers before a report is shared outside the organisation. They run in
+> the same query that draws the map. The Couchbase MCP Server, in read-only mode, would let a supervisor ask an
+> assistant "which open potholes in Valley are older than a week" in plain language. AI Functions need a paid
+> cluster on Couchbase Server 8.0+ with Developer Pro or Enterprise support. Not part of this demo, which runs on the Capella free tier; see the review item in `docs/PLAN.md` §17.1 and `docs/REFERENCE.md` §4.
+
 - **Capella Columnar** for trend analysis — repeat locations, time to resolution, seasonal patterns — without
   touching the operational cluster.
 - **Eventing** to notify a duty supervisor when a report arrives in a category and district that matter.
-- **Capella AI Services** to summarise a week of reports, or to embed photographs that arrive from other channels
-  so they can be compared with the phones' vectors.
+- **Capella AI Data Plane** for summaries and triage in SQL++ (see the aside above), or to embed photographs that
+  arrive from other channels. Those vectors are only comparable with the phones' if the same model made both.
 - **Cluster-wide duplicate detection** with the Search service's vector index, catching duplicates across
   districts that no single phone can see.
 - **MapLibre with self-hosted tiles** for a dashboard that works on an isolated network.

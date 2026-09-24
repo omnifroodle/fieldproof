@@ -203,3 +203,7 @@ sup a { color: var(--sienna); text-decoration: none; padding: 0 2px; }
 .fineprint { max-width: var(--max); margin: 0 auto; padding: 40px var(--gutter) 64px; font-size: 14px; line-height: 1.5; color: #4a4a4a; }
 .fineprint ol { margin: 0 0 20px; padding-left: 20px; display: grid; gap: 8px; }
 .fineprint li:target { background: rgba(217,164,65,.3); }
+
+/* Paid-tier asides: what the Capella AI Data Plane would add. Dashed edge = not in this demo. */
+.upgrade { background: var(--chalk); border: 2px dashed var(--pineLight); border-radius: 10px; padding: 14px 18px; display: grid; gap: 6px; font-size: 16px; }
+.upgrade .tag { font: 600 13px var(--heading); letter-spacing: .12em; text-transform: uppercase; color: var(--pineLight); }

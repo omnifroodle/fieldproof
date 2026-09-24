@@ -85,6 +85,10 @@
     <div class="bignum"><span>257–323</span> ms for all three, on the phone.<sup><a href="#fn1">1</a></sup></div>
     <p>Two more run when the crew asks. Dictate the note with gloves on: speech recognition stays on the device. And the report writes its own one-line summary with Apple’s on-device language model.<sup><a href="#fn2">2</a></sup></p>
     <p class="aside">AI is supporting evidence, never a gate. If a model is missing or refuses, the report is still filed, hashed and synced.</p>
+    <aside class="upgrade">
+      <p class="tag">Capella AI Data Plane · paid tier</p>
+      <p>No Apple Intelligence on an older phone? The report still syncs, and a SQL++ <code>ai_summary</code> call on the server can write its summary there instead.<sup><a href="#fn8">8</a></sup></p>
+    </aside>
     <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/on-device-ai.md">How the on-device AI works →</a>
   </div>
   <figure class="phone">
@@ -154,6 +158,10 @@
     <h2>Once it syncs, it is just data.</h2>
     <p>Data a phone wrote in a canyon is ordinary Capella data the moment it lands: SQL++, indexes and joins. One query draws the map. A change feed puts a new report on the supervisor’s screen with no polling.</p>
     <div class="bignum"><span>~3 s</span> from filing on the phone to a new pin on the map.<sup><a href="#fn4">4</a></sup></div>
+    <aside class="upgrade">
+      <p class="tag">Capella AI Data Plane · paid tier</p>
+      <p>Add AI to the same SQL++ that draws the map: a weekly digest with <code>ai_summary</code>, triage with <code>ai_classification</code>, and names and phone numbers hidden with <code>ai_masked</code> before a report leaves the organisation.<sup><a href="#fn8">8</a></sup></p>
+    </aside>
     <a class="more" href="https://github.com/omnifroodle/fieldproof/blob/main/docs/architecture/dashboard-and-capella.md">How the dashboard reads Capella →</a>
   </div>
   <figure class="frame">
@@ -233,6 +241,7 @@
     <div><dt>Sync</dt><dd>Capella App Services 4.1.2 over a WebSocket. One replicator, both collections, channels per district.</dd></div>
     <div><dt>Cloud</dt><dd>Capella cluster, SQL++ via the Node SDK. Live updates from the App Services changes feed.</dd></div>
     <div><dt>Requirements</dt><dd>iOS 17 or later. The summary needs iOS 26 on a device with Apple Intelligence (iPhone 15 Pro or newer).</dd></div>
+    <div><dt>Room to grow</dt><dd>On a paid Capella cluster, the AI Data Plane adds AI Functions in SQL++, hosted models, vectorization workflows and an MCP server. Not used by this demo.<sup><a href="#fn8">8</a></sup></dd></div>
     <div><dt>Size</dt><dd>About 3,000 lines of Swift and 530 of JavaScript. Two Swift packages, no JavaScript build step.</dd></div>
   </dl>
 </section>
@@ -268,6 +277,7 @@
     <li id="fn5">Recorded on the iOS Simulator and sped up 3×. On the simulator, Vision’s image models do not run, so the demo’s sample photos carry results precomputed on a Mac with the same model. On a device, every model runs live.</li>
     <li id="fn6">Illustrative arithmetic: 200 × 40 = 8,000 photographs, one on-device inference pass each. Not a customer measurement.</li>
     <li id="fn7">Same pothole with a crop or hue shift: 0.019–0.020. With a 3° rotation: 0.092–0.102. Two different potholes: 0.18–0.31. The threshold is a number you measure on your own photographs.</li>
+    <li id="fn8">The Capella AI Data Plane is not part of this demo, which runs on the Capella free tier; it is on the roadmap to review. AI Functions need a paid Capella cluster on Couchbase Server 8.0 or later, with Developer Pro or Enterprise support and multiple availability zones. Server-side calls are charged per use and need a connection; capture on the phone never waits for them. Vectors from a server-side model are not comparable with the phone’s Vision vectors. Source: <a href="https://docs.couchbase.com/ai/get-started/intro.html">Couchbase AI Data Plane docs</a>, checked September 2026.</li>
   </ol>
   <p>FieldProof is a demo built to show Couchbase Lite, Couchbase Lite Vector Search, Capella App Services and Capella working together. Couchbase, Capella and Couchbase Lite are trademarks of Couchbase, Inc. iPhone and Apple Intelligence are trademarks of Apple Inc. Sample photos are public domain or CC0.</p>
 </footer>
