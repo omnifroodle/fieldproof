@@ -47,7 +47,7 @@ Update this line at the end of every phase. Keep a short "what works / what does
   only the `.example` files are committed. If you need a credential, finish everything else, then ask.
 - **Persona is generic.** Field crew, crew member, technician, inspector, supervisor. No job titles
   ("ranger", "officer") in UI text, identifiers, comments, or docs. The park theme is visual only.
-- **Small and readable.** Under ~3,000 lines of Swift, under ~800 of JavaScript, no JS build step,
+- **Small and readable.** Under ~3,000 lines of Swift, under ~800 of JavaScript (the deck viewer, `site/` and `scripts/build-site.mjs` don't count), no JS build step,
   no Swift dependencies beyond `CouchbaseLiteSwift` and `CouchbaseLiteVectorSearch`.
 - **Talking-point comments.** Every use of a Couchbase feature gets a 1–3 line comment a presenter can
   read aloud. `DuplicateCheckQuery.swift` is shown on screen; keep it under 120 lines with a comment per clause.
