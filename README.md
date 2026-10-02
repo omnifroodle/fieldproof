@@ -32,6 +32,124 @@ feed instead of polling. The first two need a real device (`docs/REFERENCE.md` ย
 
 ---
 
+## Reskin it for your customer
+
+The demo lands hardest when the reports look like the customer's own work: their categories, their territories,
+their words. Here is a prompt for [Claude Code](https://claude.com/claude-code) that makes its own copy of this repo,
+**asks you about the customer you are demoing for and the things they will want to classify**, then reskins
+the app, dashboard, sample data, docs, and deck to match.
+
+**To use it:** open Claude Code in the folder where you keep projects (the [GitHub CLI](https://cli.github.com/) `gh`
+must be signed in, and ยง1's prerequisites apply), and paste everything in the box. It starts by asking you questions
+and changes nothing until you approve its plan. It asks for Capella credentials last.
+
+```text
+You are going to reskin FieldProof for a specific customer. FieldProof is a Couchbase demo: an offline-first
+field reporting app (iOS, SwiftUI, Couchbase Lite with on-device vector search) that syncs through Capella App
+Services, plus a Node dashboard. The upstream repo is https://github.com/omnifroodle/fieldproof. Work in my own
+copy of it. Never push to omnifroodle/fieldproof.
+
+STEP 0. GET A COPY
+Ask me where to put it and what to call it. Ask whether I want a private copy or a public fork. Default to a
+private copy: clone the repo, then create a new private repo under my account with gh and point origin at it.
+Customer names should not be public, and a GitHub fork of a public repo is always public. Then read AGENTS.md,
+docs/PLAN.md, docs/REFERENCE.md, and docs/STYLE-GUIDE.md. AGENTS.md rules apply, except where this prompt
+says otherwise.
+
+STEP 1. INTERVIEW ME
+Before you change anything, ask me these questions in ONE message, numbered. Where you can, suggest examples so
+I can answer quickly. If an answer is vague, ask a follow-up instead of guessing.
+
+ 1. Who is the customer, and what do they do? (Industry, size, and who will be in the room.)
+ 2. What do their field people photograph and report? List the 4 to 6 categories they would want to classify
+    (for example: pole damage, vegetation encroachment, leaking valve, corroded fitting), what a photo of each
+    typically looks like, and one catch-all "other".
+ 3. What words do they use? What do they call the people in the field, the supervisor, the thing being filed
+    (report, ticket, inspection, work order), and the areas they are split into (district, region, site,
+    territory, plant, route)?
+ 4. Name two or three of those areas. Where are they? I want real coordinates so the map and GPS are plausible.
+ 5. Is their work status flow different from Open, In progress, Resolved? Keep it to three states.
+ 6. Is there text in their photos that matters (asset tags, serial plates, meter dials, signage, license plates)?
+    This drives the on-device text-recognition moment in the demo.
+ 7. What should it look and feel like? Brand colors, a mood, anything to avoid. Do I have a logo and the right
+    to use it?
+ 8. Do I have my own photos for these categories? If not, you will source public-domain or CC0 photos.
+ 9. Where will I demo it: simulator only, or a real iPhone? Will I use the same Capella cluster as the original
+    or a new one?
+
+STEP 2. PROPOSE A PLAN, THEN WAIT
+Show me one table, old to new, covering: categories (labels and SF Symbols), areas, users and their channels,
+statuses, header and banner copy, palette and fonts, the demo location, and the photos you will source. List the
+files you will touch and the ones you will leave alone. Stop and wait for my approval. This is the phase gate.
+
+STEP 3. RESKIN IT
+Make the change in these places. Search for more; this list is a start, not a limit.
+
+ - Categories: ios/FieldProof/Data/ReportCategory.swift (cases, labels, SF Symbols; confirm every symbol name
+   exists), dashboard/public/common.js (CATEGORY_LABEL), the glyph list in docs/STYLE-GUIDE.md, and the
+   "category" values in ios/FieldProof/Demo/Samples/manifest.json. Keep an "other".
+ - Areas and users: ios/FieldProof/App/AppUser.swift (cases, labels, header lines), ios/FieldProof/Config/
+   Secrets.swift and Secrets.example.plist, ios/FieldProof/Demo/SeedData.swift, the area chips in
+   dashboard/public/app.js, scripts/setup-cluster.mjs messages, and the channel table in this README.
+   Change what people SEE by default. The stored field is named `district` and the channels are
+   `district.<name>`; it appears in both sync functions, an index, and the dashboard queries. Ask me before
+   renaming it, because that also changes the App Services users I have to create.
+ - Statuses: ios/FieldProof/Data/ReportStatus.swift and the dashboard. Keep three states, and keep the rule that
+   a resolved report is not a duplicate candidate (DuplicateCheckQuery.swift).
+ - Place: demoLat and demoLon in ios/FieldProof/Capture/LocationService.swift, the map view in
+   dashboard/public/app.js, the demo text in ios/FieldProof/Settings/SettingsView.swift, and the coordinates in
+   manifest.json.
+ - Look: Theme.swift, PosterHeader.swift, EmptyTrailView.swift, SyncBanner.swift copy, dashboard/public/
+   styles.css, docs/STYLE-GUIDE.md, docs/style-as-built.md, docs/images/banner.png, site/, and deck/. Rewrite the
+   style guide first so the app and dashboard follow one system. Any new font must be SIL Open Font License;
+   update ios/FieldProof/Design/Fonts/FONTS.md. Legibility in sunlight beats decoration.
+ - Photos: ios/FieldProof/Demo/Samples. Replace the sample photos for the new categories. Public-domain or CC0
+   only (or the photos I supplied), each with its source and license in ATTRIBUTION.md. If you cannot find a
+   suitable photo, stop and ask me; never use a non-free image. Keep the structure: near-duplicate sets for the
+   duplicate-check beat (adapt scripts/make-variants.swift), one "capture" photo per category that is NOT seeded,
+   and one capture photo with text that matters for the text-recognition beat. Then run
+   `swift scripts/embed-samples.swift` from the repo root so the simulator has precomputed vectors that match the
+   new bytes.
+ - Docs and talking points: the README intro and the 5-minute demo table, docs/demo-guide.md, the "How FieldProof
+   uses it" and "Talking points" sections of docs/architecture/, the talking-point comments in the Swift and
+   JavaScript, and the deck. Rewrite examples in the customer's words. Then run `node scripts/build-site.mjs`.
+
+STEP 4. RE-MEASURE THE DUPLICATE CHECK
+DuplicateCheckQuery.defaultMaxDistance (0.15) was tuned on the original photos. New imagery needs its own
+measurement; docs/architecture/vector-search-on-device.md describes how it was done. Confirm that a capture photo
+fires "Looks familiar" against its near-duplicates and that different photos of the same category do not. Adjust
+the constant if needed and update that doc with the new numbers.
+
+STEP 5. VERIFY, THEN REPORT
+Do what AGENTS.md says: build for the simulator and run it, drive the demo flow, take screenshots, run the
+Swift tests and `npm test`, and build for a device if one is connected. Search the whole repo for leftovers of
+the old theme (pothole, graffiti, Yosemite, Valley, Tuolumne, trail, park) and fix them, except the photo
+attributions and git history. Check the budgets: app Swift under 3,000 lines (a reskin is mostly strings and data;
+if you need more room, delete something), JavaScript under 800, DuplicateCheckQuery.swift under 120.
+
+STEP 6. CAPELLA AND SECRETS, LAST
+Do not ask for credentials until everything above is done. Then tell me exactly what I need to do in Capella:
+the App Services users and their channels, the sync functions to paste, and the commands to run. Never commit
+Secrets.plist or dashboard/.env.
+
+RULES
+ - Keep the five beats: works offline, AI on the device, duplicate check before saving, evidence hash at capture,
+   sync scoped by channel. Do not remove or weaken any of them.
+ - The customer's vocabulary and name are welcome in the UI and docs. That replaces the "Persona is generic" rule
+   in this copy: edit that rule in this copy's AGENTS.md to say so. Do not use customer logos, trademarks, or
+   insignia unless I gave them to you and said I have the right to use them.
+ - Do not invent facts about the customer (their sites, assets, or numbers). Where the demo needs plausible data,
+   make it clearly fictional.
+ - Commit in logical steps with messages that say what was reskinned. Push to my copy only at the end, after I
+   say so. Update the status line in AGENTS.md to say this copy is reskinned for the customer.
+ - Finish with a short report: what changed, what you ran and what you observed, and what is left for me.
+```
+
+**Before you present it:** run the reskinned app once end to end, with Simulate offline on, because the demo
+script's numbers (30 pins, two nearby duplicates, 98% alike) belong to the original photos and will differ.
+
+---
+
 ## 1. Prerequisites
 
 - **macOS** with **Xcode 26 or newer** and an iOS 17+ simulator. Xcode 27.0 and the iOS 26.4 simulator were used.
