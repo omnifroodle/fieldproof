@@ -207,3 +207,8 @@ sup a { color: var(--sienna); text-decoration: none; padding: 0 2px; }
 /* Paid-tier asides: what the Capella AI Data Plane would add. Dashed edge = not in this demo. */
 .upgrade { background: var(--chalk); border: 2px dashed var(--pineLight); border-radius: 10px; padding: 14px 18px; display: grid; gap: 6px; font-size: 16px; }
 .upgrade .tag { font: 600 13px var(--heading); letter-spacing: .12em; text-transform: uppercase; color: var(--pineLight); }
+
+/* The "not a product" note at the foot of the page: the same words on every demo page, in this page's theme. */
+.disclaimer { margin-top: 8px; padding: 18px 22px; border: 2px solid var(--pine); border-radius: 10px; background: var(--chalk); color: var(--pine); display: grid; gap: 8px; }
+.disclaimer p { margin: 0; }
+.disclaimer .marks { color: #4a4a4a; }
